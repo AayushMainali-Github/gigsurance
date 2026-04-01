@@ -14,7 +14,8 @@ function distanceKm(aLat, aLng, bLat, bLng) {
 }
 
 function randomPointWithinRadius(city, rng, bias = 1) {
-  const radius = city.radiusKm * Math.sqrt(rng.next()) * bias;
+  const safeBias = Math.min(0.96, Math.max(0.05, bias));
+  const radius = city.radiusKm * Math.sqrt(rng.next()) * safeBias;
   const angle = rng.float(0, Math.PI * 2);
   const dx = radius * Math.cos(angle);
   const dy = radius * Math.sin(angle);
@@ -28,7 +29,7 @@ function makePoint(point) {
 }
 
 function withinCity(point, city) {
-  return distanceKm(point.lat, point.lng, city.centerLat, city.centerLng) <= city.radiusKm * 1.02;
+  return distanceKm(point.lat, point.lng, city.centerLat, city.centerLng) <= city.radiusKm;
 }
 
 module.exports = { distanceKm, randomPointWithinRadius, makePoint, withinCity };

@@ -1,7 +1,7 @@
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 const { parseArgs } = require("./utils/cli");
-const { connectDb, disconnectDb } = require("./utils/db");
+const { connectDb, disconnectDb, resetDatabase } = require("./utils/db");
 const { seedDelivery } = require("./generators/deliveryGenerator");
 const { reportDeliveryValidation } = require("./validators/reporting");
 
@@ -15,10 +15,14 @@ async function main() {
   const driverCount = Number(args.limit || process.env.DRIVER_COUNT || 100000);
   await connectDb();
   try {
+    if (!args["dry-run"]) {
+      await resetDatabase();
+      console.log("[delivery] dropped database before reseed");
+    }
     const result = await seedDelivery({
       seed: args.seedValue || process.env.SEED || 42,
       driverCount,
-      deliveryMonths: Number(process.env.DELIVERY_MONTHS || 48),
+      deliveryMonths: Number(process.env.DELIVERY_MONTHS || 24),
       batchSize: Number(args.batchSize || process.env.BATCH_SIZE || 1000),
       clearExisting: Boolean(args.clear),
       cityFilter: args.city || null,

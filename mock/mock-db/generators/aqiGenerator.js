@@ -1,6 +1,6 @@
 const AqiSnapshot = require("../models/aqiSnapshot");
 const { cities } = require("../config/cities");
-const { monthsAgoStart, dayjs } = require("../utils/time");
+const { monthsAgoExact, nowUtc } = require("../utils/time");
 const { createRng } = require("../utils/rng");
 
 function getAqiCategory(aqi) {
@@ -23,8 +23,8 @@ function regionalAqiBaseline(city, month) {
 }
 
 async function seedAqi({ seed, envMonths, batchSize, clearExisting, cityFilter, dryRun }) {
-  const start = monthsAgoStart(envMonths);
-  const end = dayjs.utc().startOf("hour");
+  const end = nowUtc();
+  const start = monthsAgoExact(envMonths, end);
   const selectedCities = cityFilter ? cities.filter((city) => city.city === cityFilter) : cities;
   let batch = [];
   let inserted = 0;
@@ -34,7 +34,7 @@ async function seedAqi({ seed, envMonths, batchSize, clearExisting, cityFilter, 
   for (const city of selectedCities) {
     const rng = createRng(`${seed}:aqi:${city.city}`);
     let spikeHours = 0;
-    let cursor = start.clone().startOf("day");
+    let cursor = start.clone();
 
     while (cursor.isBefore(end) || cursor.isSame(end)) {
       const month = cursor.month() + 1;

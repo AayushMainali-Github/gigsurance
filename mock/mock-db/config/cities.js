@@ -106,7 +106,7 @@ Panihati|West Bengal|tier3|22.6909|88.374|10|0.06|east|0|heavy|0.42|0.7
 Latur|Maharashtra|tier3|18.4088|76.5604|10|0.058|central|0|light|0.06|0.91
 Dhule|Maharashtra|tier3|20.9042|74.7749|10|0.056|west|0|moderate|0.08|0.86`;
 
-const cities = CITY_CSV.split("\n").map((line) => {
+const cities = CITY_CSV.split("\n").slice(0, 100).map((line) => {
   const [city, state, tier, centerLat, centerLng, radiusKm, weight, region, coastal, monsoon, northIntensity, heatIntensity] = line.split("|");
   return {
     city,

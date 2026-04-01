@@ -2,7 +2,7 @@ const { calculateObjectSize } = require("bson");
 const DeliveryDriver = require("../models/deliveryDriver");
 const { cities } = require("../config/cities");
 const { PLATFORMS, PLATFORM_MIX_BY_TIER, isFood, isLogistics, isQuickCommerce } = require("../config/platforms");
-const { dateKey, monthsAgoStart, dayjs } = require("../utils/time");
+const { dateKey, monthsAgoExact, nowUtc, dayjs } = require("../utils/time");
 const { createRng } = require("../utils/rng");
 const { allocateExactCount } = require("../utils/allocation");
 const { buildCityAssets } = require("../utils/city-assets");
@@ -16,13 +16,20 @@ function allocateDriversByCity(totalDrivers, selectedCities) {
 }
 
 function getJoinedAt(rng, deliveryMonths) {
-  const monthsBack = Number(rng.weightedPick([
-    [rng.float(0.2, 3), 18],
-    [rng.float(3, 12), 34],
-    [rng.float(12, 24), 28],
-    [rng.float(24, 36), 15],
-    [rng.float(36, Math.max(36.2, deliveryMonths)), 5]
-  ]));
+  const distribution = deliveryMonths <= 24
+    ? [
+        [rng.float(0.2, 3), 18],
+        [rng.float(3, 12), 34],
+        [rng.float(12, 24), 48]
+      ]
+    : [
+        [rng.float(0.2, 3), 18],
+        [rng.float(3, 12), 34],
+        [rng.float(12, 24), 28],
+        [rng.float(24, 36), 15],
+        [rng.float(36, Math.max(36.2, deliveryMonths)), 5]
+      ];
+  const monthsBack = Number(rng.weightedPick(distribution));
   return dayjs.utc().subtract(monthsBack, "month").subtract(rng.int(0, 27), "day").toDate();
 }
 
@@ -140,12 +147,14 @@ function validateDriverDocument(doc, city) {
 }
 
 async function seedDelivery({ seed, driverCount, deliveryMonths, batchSize, clearExisting, cityFilter, dryRun, limit }) {
+  const end = nowUtc();
+  const start = monthsAgoExact(deliveryMonths, end);
   const selectedCities = cityFilter ? cities.filter((city) => city.city === cityFilter) : cities;
   const targetCount = limit ? Math.min(Number(limit), driverCount) : driverCount;
   const driversByCity = allocateDriversByCity(targetCount, selectedCities);
   const disruptionStore = await loadDisruptionStore(seed, Math.min(24, deliveryMonths), cityFilter);
   const cityAssets = new Map(selectedCities.map((city) => [city.city, buildCityAssets(city, createRng(`${seed}:assets:${city.city}`))]));
-  const recentStart = monthsAgoStart(24);
+  const recentStart = monthsAgoExact(Math.min(24, deliveryMonths), end);
 
   if (clearExisting && !dryRun) await DeliveryDriver.deleteMany(cityFilter ? { city: cityFilter } : {});
 
@@ -166,10 +175,10 @@ async function seedDelivery({ seed, driverCount, deliveryMonths, batchSize, clea
       const joinedAt = getJoinedAt(rng, deliveryMonths);
       const profile = buildDriverProfile(city, platformName, assets, rng);
       const history = [];
-      let cursor = dayjs.utc(joinedAt).startOf("day");
+      let cursor = dayjs.utc(joinedAt);
       let gigCounter = 0;
 
-      while (cursor.isBefore(dayjs.utc()) || cursor.isSame(dayjs.utc(), "day")) {
+      while (cursor.isBefore(end)) {
         const key = dateKey(cursor);
         const disruption = cursor.isAfter(recentStart.subtract(1, "day")) ? disruptionStore.get(city.city, key) || fallbackDisruption(city, cursor, seed) : fallbackDisruption(city, cursor, seed);
         const weekday = cursor.day();

@@ -1,7 +1,7 @@
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 const { parseArgs } = require("./utils/cli");
-const { connectDb, disconnectDb } = require("./utils/db");
+const { connectDb, disconnectDb, resetDatabase } = require("./utils/db");
 const { seedAqi } = require("./generators/aqiGenerator");
 const { reportUniquenessValidation } = require("./validators/reporting");
 
@@ -14,6 +14,10 @@ async function main() {
 
   await connectDb();
   try {
+    if (!args["dry-run"]) {
+      await resetDatabase();
+      console.log("[aqi] dropped database before reseed");
+    }
     const result = await seedAqi({
       seed: args.seedValue || process.env.SEED || 42,
       envMonths: Number(process.env.ENV_MONTHS || 24),

@@ -16,4 +16,8 @@ async function disconnectDb() {
   await mongoose.disconnect();
 }
 
-module.exports = { connectDb, disconnectDb, mongoose };
+async function resetDatabase() {
+  await mongoose.connection.dropDatabase();
+}
+
+module.exports = { connectDb, disconnectDb, resetDatabase, mongoose };

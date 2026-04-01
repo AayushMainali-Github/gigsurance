@@ -1,6 +1,6 @@
 const WeatherSnapshot = require("../models/weatherSnapshot");
 const { cities } = require("../config/cities");
-const { monthsAgoStart, dayjs } = require("../utils/time");
+const { monthsAgoExact, nowUtc } = require("../utils/time");
 const { createRng } = require("../utils/rng");
 
 function monthTemperatureBaseline(city, month) {
@@ -29,8 +29,8 @@ function buildWeatherCondition(snapshot) {
 }
 
 async function seedWeather({ seed, envMonths, batchSize, clearExisting, cityFilter, dryRun }) {
-  const start = monthsAgoStart(envMonths);
-  const end = dayjs.utc().startOf("hour");
+  const end = nowUtc();
+  const start = monthsAgoExact(envMonths, end);
   const selectedCities = cityFilter ? cities.filter((city) => city.city === cityFilter) : cities;
   let batch = [];
   let inserted = 0;
