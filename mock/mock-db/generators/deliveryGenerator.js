@@ -10,6 +10,8 @@ const { randomPointWithinRadius, makePoint, withinCity } = require("../utils/geo
 const { loadDisruptionStore, fallbackDisruption } = require("./disruptionStore");
 
 const MAX_SAFE_DOC_BYTES = 12 * 1024 * 1024;
+const DEFAULT_DELIVERY_BATCH_LIMIT = 25;
+const MAX_DELIVERY_BATCH_BYTES = 32 * 1024 * 1024;
 
 function allocateDriversByCity(totalDrivers, selectedCities) {
   return allocateExactCount(selectedCities, totalDrivers, (city) => city.weight);
@@ -172,6 +174,8 @@ async function seedDelivery({ seed, driverCount, deliveryMonths, batchSize, clea
   const validationStats = { totalDrivers: 0, driversByCity: {}, driversByPlatform: {}, normalNoWork: { days: 0, noWork: 0 }, disruptedNoWork: { days: 0, noWork: 0 }, preventedOversized: 0 };
   const platformCounters = Object.fromEntries(PLATFORMS.map((platform) => [platform, 0]));
   let batch = [];
+  let batchBytes = 0;
+  const effectiveBatchSize = Math.min(Number(batchSize) || DEFAULT_DELIVERY_BATCH_LIMIT, DEFAULT_DELIVERY_BATCH_LIMIT);
 
   for (const city of selectedCities) {
     const cityCount = driversByCity.get(city.city) || 0;
@@ -250,19 +254,22 @@ async function seedDelivery({ seed, driverCount, deliveryMonths, batchSize, clea
       if (!validation.ok) throw new Error(`Driver validation failed for ${doc.platformDriverId}: ${validation.reason}`);
 
       batch.push({ updateOne: { filter: { platformName: doc.platformName, platformDriverId: doc.platformDriverId }, update: { $set: doc }, upsert: true } });
+      batchBytes += doc.bsonSizeBytes;
       validationStats.totalDrivers += 1;
       validationStats.driversByPlatform[platformName] = (validationStats.driversByPlatform[platformName] || 0) + 1;
 
-      if (batch.length >= batchSize) {
+      if (batch.length >= effectiveBatchSize || batchBytes >= MAX_DELIVERY_BATCH_BYTES) {
         if (!dryRun) await DeliveryDriver.bulkWrite(batch, { ordered: false });
         console.log(`[delivery] processed ${validationStats.totalDrivers}/${targetCount}`);
         batch = [];
+        batchBytes = 0;
       }
     }
   }
 
   if (batch.length) {
     if (!dryRun) await DeliveryDriver.bulkWrite(batch, { ordered: false });
+    batchBytes = 0;
   }
 
   console.log("[delivery] no-work normal pct:", Number((validationStats.normalNoWork.noWork / Math.max(validationStats.normalNoWork.days, 1)).toFixed(3)));
