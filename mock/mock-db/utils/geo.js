@@ -14,14 +14,24 @@ function distanceKm(aLat, aLng, bLat, bLng) {
 }
 
 function randomPointWithinRadius(city, rng, bias = 1) {
-  const safeBias = Math.min(0.96, Math.max(0.05, bias));
-  const radius = city.radiusKm * Math.sqrt(rng.next()) * safeBias;
-  const angle = rng.float(0, Math.PI * 2);
-  const dx = radius * Math.cos(angle);
-  const dy = radius * Math.sin(angle);
-  const lat = city.centerLat + dy / 111;
-  const lng = city.centerLng + dx / (111 * Math.cos(toRadians(city.centerLat)));
-  return { lat, lng };
+  const safeBias = Math.min(0.9, Math.max(0.05, bias));
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const radius = city.radiusKm * Math.sqrt(rng.next()) * safeBias;
+    const angle = rng.float(0, Math.PI * 2);
+    const dx = radius * Math.cos(angle);
+    const dy = radius * Math.sin(angle);
+    const lat = city.centerLat + dy / 111;
+    const lng = city.centerLng + dx / (111 * Math.cos(toRadians(city.centerLat)));
+    const point = { lat, lng };
+    if (withinCity(point, city)) {
+      return point;
+    }
+  }
+
+  return {
+    lat: city.centerLat,
+    lng: city.centerLng
+  };
 }
 
 function makePoint(point) {

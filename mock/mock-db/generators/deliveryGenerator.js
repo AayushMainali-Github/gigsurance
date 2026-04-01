@@ -134,16 +134,27 @@ function compactHistory(doc) {
 }
 
 function validateDriverDocument(doc, city) {
-  if (doc.history.some((item) => item.reachedTimeUnix <= item.startTimeUnix || item.durationMinutes < 0)) return false;
-  for (const item of doc.history) {
+  for (let i = 0; i < doc.history.length; i += 1) {
+    const item = doc.history[i];
+    if (item.reachedTimeUnix <= item.startTimeUnix) {
+      return { ok: false, reason: `reached before start at history[${i}]` };
+    }
+    if (item.durationMinutes < 0) {
+      return { ok: false, reason: `negative duration at history[${i}]` };
+    }
     const pickup = { lng: item.pickup.coordinates[0], lat: item.pickup.coordinates[1] };
     const drop = { lng: item.drop.coordinates[0], lat: item.drop.coordinates[1] };
-    if (!withinCity(pickup, city) || !withinCity(drop, city)) return false;
+    if (!withinCity(pickup, city)) {
+      return { ok: false, reason: `pickup outside city at history[${i}]` };
+    }
+    if (!withinCity(drop, city)) {
+      return { ok: false, reason: `drop outside city at history[${i}]` };
+    }
+    if (i > 0 && item.startTimeUnix < doc.history[i - 1].startTimeUnix) {
+      return { ok: false, reason: `history not sorted at history[${i}]` };
+    }
   }
-  for (let i = 1; i < doc.history.length; i += 1) {
-    if (doc.history[i].startTimeUnix < doc.history[i - 1].startTimeUnix) return false;
-  }
-  return true;
+  return { ok: true };
 }
 
 async function seedDelivery({ seed, driverCount, deliveryMonths, batchSize, clearExisting, cityFilter, dryRun, limit }) {
@@ -202,6 +213,7 @@ async function seedDelivery({ seed, driverCount, deliveryMonths, batchSize, clea
         while (nextTime.isBefore(stopTime)) {
           const cycle = cycleMinutes(platformName, disruption, rng);
           const startTime = nextTime.valueOf();
+          const gigDate = dateKey(startTime);
           const reachMinutes = isQuickCommerce(platformName) ? rng.float(5, 12) * (1 + disruption.weatherImpactScore * 0.25) : isFood(platformName) ? rng.float(20, 60) * (1 + disruption.weatherImpactScore * 0.28) : rng.float(25, 80) * (1 + disruption.weatherImpactScore * 0.3);
           const endTime = nextTime.add(cycle, "minute").valueOf();
           if (endTime > stopTime.valueOf()) break;
@@ -217,7 +229,7 @@ async function seedDelivery({ seed, driverCount, deliveryMonths, batchSize, clea
             pickup: makePoint(pickupSource),
             drop: makePoint(dropPoint),
             durationMinutes,
-            dateKey: key,
+            dateKey: gigDate,
             weatherSeverityHint: disruption.weatherSeverityHint ?? disruption.weatherImpactScore,
             aqiBandHint: disruption.aqiBandHint
           });
@@ -227,13 +239,15 @@ async function seedDelivery({ seed, driverCount, deliveryMonths, batchSize, clea
       }
 
       const doc = { platformName, platformDriverId, city: city.city, state: city.state, cityTier: city.tier, joinedAt, driverProfile: profile, history, historyCompacted: false, bsonSizeBytes: 0 };
+      doc.history.sort((a, b) => a.startTimeUnix - b.startTimeUnix || a.reachedTimeUnix - b.reachedTimeUnix);
       const compacted = compactHistory(doc);
       doc.history = compacted.history;
       doc.historyCompacted = compacted.compacted;
       doc.bsonSizeBytes = calculateObjectSize({ ...doc });
       if (doc.historyCompacted) validationStats.preventedOversized += 1;
       if (doc.bsonSizeBytes >= MAX_SAFE_DOC_BYTES) throw new Error(`BSON guard failed for ${doc.platformDriverId}`);
-      if (!validateDriverDocument(doc, city)) throw new Error(`Driver validation failed for ${doc.platformDriverId}`);
+      const validation = validateDriverDocument(doc, city);
+      if (!validation.ok) throw new Error(`Driver validation failed for ${doc.platformDriverId}: ${validation.reason}`);
 
       batch.push({ updateOne: { filter: { platformName: doc.platformName, platformDriverId: doc.platformDriverId }, update: { $set: doc }, upsert: true } });
       validationStats.totalDrivers += 1;
