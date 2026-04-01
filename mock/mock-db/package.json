@@ -7,7 +7,7 @@
     "seed:weather": "node weather-db.js --seed",
     "seed:aqi": "node aqi-db.js --seed",
     "seed:delivery": "node delivery-db.js --seed",
-    "seed:all": "node weather-db.js --seed && node aqi-db.js --seed && node delivery-db.js --seed"
+    "seed:all": "node seed-all.js"
   },
   "keywords": [
     "mongodb",
