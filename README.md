@@ -261,11 +261,11 @@ Admin dashboard is a separate **React web app** for insurer and ops teams.
 
 | Integration | Provider | Mode |
 |---|---|---|
-| Weather | OpenWeatherMap free tier | Live |
-| AQI | OpenAQ REST API | Live |
-| Civil alerts | NewsAPI | Mock signed JSON feed |
-| Traffic | Google Routes API | Mock acceptable |
-| Platform data | Zomato / Swiggy | Simulated mock |
+| Weather | OpenWeatherMap free tier | Mock |
+| AQI | OpenAQ REST API | Mock |
+| Civil alerts | NewsAPI | Mock |
+| Traffic | Google Routes API | Mock |
+| Platform data | Zomato / Swiggy | Mock |
 | Payments | Razorpay test mode | Sandbox |
 | Device integrity | Play Integrity API | Live (Android) |
 
