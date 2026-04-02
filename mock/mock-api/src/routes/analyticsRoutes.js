@@ -248,4 +248,110 @@ router.get("/correlations", async (req, res, next) => {
   }
 });
 
+router.get("/driver-risk/:platformName/:platformDriverId", async (req, res, next) => {
+  try {
+    const historyLimit = Math.max(30, Math.min(2000, toNumber(req.query.historyLimit, 500)));
+    const driver = await DeliveryDriver.findOne({
+      platformName: req.params.platformName,
+      platformDriverId: req.params.platformDriverId
+    }).lean();
+
+    if (!driver) {
+      return res.status(404).json({ ok: false, error: "Driver not found" });
+    }
+
+    const history = (driver.history || []).slice(-historyLimit);
+    const totalGigs = history.length;
+    const totals = history.reduce((acc, item) => {
+      const pay = Number(item.amountPaid || 0);
+      const duration = Number(item.durationMinutes || 0);
+      const weather = Number(item.weatherSeverityHint || 0);
+      acc.totalPay += pay;
+      acc.totalDuration += duration;
+      acc.totalWeather += weather;
+      if (weather >= 0.7) acc.highWeatherExposure += 1;
+      if (item.aqiBandHint === "severe" || item.aqiBandHint === "very_poor") acc.highAqiExposure += 1;
+      if (duration >= 60) acc.longTrips += 1;
+      if (pay >= 35) acc.highPayTrips += 1;
+      const day = item.dateKey;
+      if (!acc.days.has(day)) acc.days.set(day, { gigs: 0, pay: 0, duration: 0, weather: 0 });
+      const bucket = acc.days.get(day);
+      bucket.gigs += 1;
+      bucket.pay += pay;
+      bucket.duration += duration;
+      bucket.weather += weather;
+      return acc;
+    }, {
+      totalPay: 0,
+      totalDuration: 0,
+      totalWeather: 0,
+      highWeatherExposure: 0,
+      highAqiExposure: 0,
+      longTrips: 0,
+      highPayTrips: 0,
+      days: new Map()
+    });
+
+    const dailyTrend = Array.from(totals.days.entries())
+      .map(([dateKey, item]) => ({
+        dateKey,
+        gigs: item.gigs,
+        avgPay: Number((item.pay / item.gigs).toFixed(2)),
+        avgDuration: Number((item.duration / item.gigs).toFixed(2)),
+        avgWeather: Number((item.weather / item.gigs).toFixed(3))
+      }))
+      .sort((left, right) => left.dateKey.localeCompare(right.dateKey))
+      .slice(-30);
+
+    const weatherExposureRate = totalGigs ? totals.highWeatherExposure / totalGigs : 0;
+    const aqiExposureRate = totalGigs ? totals.highAqiExposure / totalGigs : 0;
+    const longTripRate = totalGigs ? totals.longTrips / totalGigs : 0;
+    const payoutStrength = totalGigs ? totals.highPayTrips / totalGigs : 0;
+    const discipline = Number(driver.driverProfile?.attendanceDiscipline || 0);
+    const resilience = Number(driver.driverProfile?.resilienceScore || 0);
+    const sensitivityPenalty = driver.driverProfile?.weatherSensitivity === "high" ? 0.18 : driver.driverProfile?.weatherSensitivity === "medium" ? 0.09 : 0.03;
+    const riskScore = Math.max(0, Math.min(1, (
+      weatherExposureRate * 0.28 +
+      aqiExposureRate * 0.22 +
+      longTripRate * 0.15 +
+      sensitivityPenalty +
+      (1 - discipline) * 0.15 +
+      (1 - resilience) * 0.1 -
+      payoutStrength * 0.08
+    )));
+
+    const riskBand = riskScore >= 0.7 ? "high" : riskScore >= 0.4 ? "medium" : "low";
+
+    return res.json({
+      ok: true,
+      data: {
+        driver: {
+          platformName: driver.platformName,
+          platformDriverId: driver.platformDriverId,
+          city: driver.city,
+          state: driver.state,
+          cityTier: driver.cityTier,
+          joinedAt: driver.joinedAt,
+          driverProfile: driver.driverProfile
+        },
+        summary: {
+          totalGigs,
+          avgPay: totalGigs ? Number((totals.totalPay / totalGigs).toFixed(2)) : 0,
+          avgDuration: totalGigs ? Number((totals.totalDuration / totalGigs).toFixed(2)) : 0,
+          avgWeatherExposure: totalGigs ? Number((totals.totalWeather / totalGigs).toFixed(3)) : 0,
+          weatherExposureRate: Number(weatherExposureRate.toFixed(3)),
+          aqiExposureRate: Number(aqiExposureRate.toFixed(3)),
+          longTripRate: Number(longTripRate.toFixed(3)),
+          payoutStrength: Number(payoutStrength.toFixed(3)),
+          riskScore: Number(riskScore.toFixed(3)),
+          riskBand
+        },
+        dailyTrend
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 module.exports = router;

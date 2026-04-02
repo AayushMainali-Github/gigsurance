@@ -26,5 +26,6 @@ export const api = {
   getLiveOrders: (query = '') => request(`/api/live/orders${query ? `?${query}` : ''}`),
   getLiveMetrics: (query = '') => request(`/api/live/metrics${query ? `?${query}` : ''}`),
   getAnalyticsCityDay: (query = '') => request(`/api/analytics/city-day${query ? `?${query}` : ''}`),
-  getAnalyticsCorrelations: (query = '') => request(`/api/analytics/correlations${query ? `?${query}` : ''}`)
+  getAnalyticsCorrelations: (query = '') => request(`/api/analytics/correlations${query ? `?${query}` : ''}`),
+  getDriverRisk: (platformName, platformDriverId, historyLimit = 500) => request(`/api/analytics/driver-risk/${encodeURIComponent(platformName)}/${encodeURIComponent(platformDriverId)}?historyLimit=${historyLimit}`)
 };
