@@ -10,6 +10,7 @@ const AQI_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const DELIVERY_INTERVAL_MS = 60 * 60 * 1000;
 const jobState = { weather: false, aqi: false, delivery: false };
 const cityAssets = new Map(cities.map((city) => [city.city, buildCityAssets(city, createRng(`${process.env.SEED || 42}:assets:${city.city}`))]));
+const DELIVERY_CURSOR_KEY = "delivery:cursor";
 
 function cityByName(name) {
   return cities.find((c) => c.city === name);
@@ -223,6 +224,13 @@ async function ensureDailyNewDrivers() {
   }
 }
 
+async function ensureNewDriversForDay(day) {
+  const dayKey = dateKey(day.valueOf());
+  for (const city of cities) {
+    await addDailyDriversForCity(city, dayKey);
+  }
+}
+
 function latestSignals(weather, aqi) {
   const weatherSeverityHint = weather?.weatherSeverityScore || 0;
   const aqiBandHint = !aqi ? "clean" : aqi.aqi <= 100 ? "clean" : aqi.aqi <= 200 ? "elevated" : aqi.aqi <= 300 ? "poor" : aqi.aqi <= 400 ? "very_poor" : "severe";
@@ -230,6 +238,42 @@ function latestSignals(weather, aqi) {
   const aqiImpactScore = aqi?.severityScore || 0;
   const combinedDisruptionScore = Math.min(1, weatherImpactScore * 0.58 + aqiImpactScore * 0.32);
   return { weatherSeverityHint, aqiBandHint, weatherImpactScore, aqiImpactScore, combinedDisruptionScore, strikeFlag: false, shutdownFlag: false };
+}
+
+async function resolveDeliveryCursor(todayStart) {
+  const state = await CornState.findOne({ key: DELIVERY_CURSOR_KEY }).lean();
+  if (state?.value?.lastDayKey) {
+    return dayjs.utc(state.value.lastDayKey);
+  }
+
+  const latestHistory = await DeliveryDriver.aggregate([
+    { $unwind: "$history" },
+    { $group: { _id: null, latestStartTimeUnix: { $max: "$history.startTimeUnix" } } }
+  ]);
+
+  if (latestHistory[0]?.latestStartTimeUnix) {
+    return dayjs.utc(latestHistory[0].latestStartTimeUnix).startOf("day");
+  }
+
+  return todayStart.clone().subtract(1, "day");
+}
+
+async function persistDeliveryCursor(day) {
+  await CornState.updateOne(
+    { key: DELIVERY_CURSOR_KEY },
+    { $set: { value: { lastDayKey: dateKey(day.valueOf()) }, updatedAt: new Date() } },
+    { upsert: true }
+  );
+}
+
+async function loadSignalsForDay(cityName, day) {
+  const start = day.startOf("day").valueOf();
+  const end = day.endOf("day").valueOf();
+  const [weather, aqi] = await Promise.all([
+    WeatherSnapshot.findOne({ city: cityName, tsUnix: { $gte: start, $lte: end } }).sort({ tsUnix: -1 }).lean(),
+    AqiSnapshot.findOne({ city: cityName, tsUnix: { $gte: start, $lte: end } }).sort({ tsUnix: -1 }).lean()
+  ]);
+  return latestSignals(weather, aqi);
 }
 
 function dayWorkProbability(profile, platformName, disruption, weekday) {
@@ -290,25 +334,24 @@ function pickupPointForPlatform(platformName, city, profile, rng) {
   return rng.pick(assets.porterPool);
 }
 
-async function appendGigsToDriver(driver) {
+async function appendGigsToDriver(driver, day, disruption, nowLimit) {
   const city = cityByName(driver.city);
   if (!city) return;
-  const now = nowUtc();
-  const weather = await WeatherSnapshot.findOne({ city: driver.city }).sort({ tsUnix: -1 }).lean();
-  const aqi = await AqiSnapshot.findOne({ city: driver.city }).sort({ tsUnix: -1 }).lean();
-  const disruption = latestSignals(weather, aqi);
-  const rng = createRng(`${process.env.SEED || 42}:live:${driver.platformName}:${driver.platformDriverId}:${dateKey(now.valueOf())}`);
+  if (dayjs.utc(driver.joinedAt).isAfter(day.endOf("day"))) return;
+  const rng = createRng(`${process.env.SEED || 42}:live:${driver.platformName}:${driver.platformDriverId}:${dateKey(day.valueOf())}`);
   const history = [...(driver.history || [])];
-  const dayStart = now.startOf("day");
+  const targetDayKey = dateKey(day.valueOf());
+  if (history.some((item) => item.dateKey === targetDayKey)) return;
+  const dayStart = day.startOf("day");
   const weekday = dayStart.day();
   if (!rng.bool(dayWorkProbability(driver.driverProfile, driver.platformName, disruption, weekday))) return;
   const shiftStart = dayStart.add(pickShiftWindow(driver.driverProfile, rng), "hour").add(rng.int(0, 20), "minute");
   const shiftEnd = shiftStart.add(dayHours(driver.driverProfile, driver.platformName, disruption, rng, weekday), "hour");
-  let nextTime = history.length ? dayjs.utc(history[history.length - 1].reachedTimeUnix).add(rng.int(4, 20), "minute") : shiftStart;
+  let nextTime = shiftStart;
   if (nextTime.isBefore(shiftStart)) nextTime = shiftStart;
-  if (nextTime.isAfter(now) || nextTime.isAfter(shiftEnd)) return;
+  if (nextTime.isAfter(nowLimit) || nextTime.isAfter(shiftEnd)) return;
   let gigsAdded = 0;
-  while (nextTime.isBefore(now) && nextTime.isBefore(shiftEnd) && gigsAdded < 18) {
+  while (nextTime.isBefore(nowLimit) && nextTime.isBefore(shiftEnd) && gigsAdded < 18) {
     const cycle = cycleMinutes(driver.platformName, disruption, rng);
     const startTime = nextTime.valueOf();
     const reachMinutes = isQuickCommerce(driver.platformName)
@@ -317,7 +360,7 @@ async function appendGigsToDriver(driver) {
         ? rng.float(20, 60) * (1 + disruption.weatherImpactScore * 0.28)
         : rng.float(25, 80) * (1 + disruption.weatherImpactScore * 0.3);
     const endTime = nextTime.add(cycle, "minute").valueOf();
-    if (endTime > now.valueOf() || endTime > shiftEnd.valueOf()) break;
+    if (endTime > nowLimit.valueOf() || endTime > shiftEnd.valueOf()) break;
     const pickup = pickupPointForPlatform(driver.platformName, city, driver.driverProfile, rng);
     const drop = isLogistics(driver.platformName) ? randomPointWithinRadius(city, rng.child(`drop:${gigsAdded}`), 0.9) : randomPointWithinRadius(city, rng.child(`drop:${gigsAdded}`), 0.82);
     const durationMinutes = Math.round((endTime - startTime) / 60000);
@@ -347,15 +390,48 @@ async function appendGigsToDriver(driver) {
   await DeliveryDriver.updateOne({ _id: driver._id }, { $set: { history: nextHistory, bsonSizeBytes, historyCompacted: nextHistory.length !== history.length } });
 }
 
+function citySampleSize(city) {
+  if (city.tier === "tier1") return 42;
+  if (city.tier === "tier2") return 22;
+  return 10;
+}
+
+async function processDeliveryDay(day, now) {
+  await ensureNewDriversForDay(day);
+  const isCurrentDay = day.isSame(now, "day");
+  const nowLimit = isCurrentDay ? now : day.endOf("day");
+
+  for (const city of cities) {
+    const disruption = await loadSignalsForDay(city.city, day);
+    const drivers = await DeliveryDriver.aggregate([
+      {
+        $match: {
+          city: city.city,
+          joinedAt: { $lte: nowLimit.toDate() }
+        }
+      },
+      { $sample: { size: citySampleSize(city) } }
+    ]);
+
+    for (const driver of drivers) {
+      await appendGigsToDriver(driver, day, disruption, nowLimit);
+    }
+  }
+}
+
 async function runDeliveryJob() {
   if (jobState.delivery) return;
   jobState.delivery = true;
   try {
-    await ensureDailyNewDrivers();
-    const sampleSize = Number(process.env.DELIVERY_DRIVER_SAMPLE || 300);
-    const drivers = await DeliveryDriver.aggregate([{ $sample: { size: sampleSize } }]);
-    for (const driver of drivers) {
-      await appendGigsToDriver(driver);
+    const now = nowUtc();
+    const todayStart = now.startOf("day");
+    const cursor = await resolveDeliveryCursor(todayStart);
+    let day = cursor.clone().add(1, "day");
+
+    while (day.isBefore(todayStart) || day.isSame(todayStart)) {
+      await processDeliveryDay(day, now);
+      await persistDeliveryCursor(day);
+      day = day.add(1, "day");
     }
     console.log("[mock-corn] delivery tick complete");
   } finally {
