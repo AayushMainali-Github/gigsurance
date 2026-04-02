@@ -1,11 +1,24 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ComposedChart,
+  Line,
+  Scatter,
+  ScatterChart,
+  Tooltip,
+  XAxis,
+  YAxis
+} from 'recharts';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
 import { formatNumber } from '../../lib/utils/format';
 import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
 import { SparkBarList } from '../../components/SparkBarList';
+import { ChartPanel } from '../../components/ChartPanel';
 
 function buildQuery({ city, platformName, state }) {
   const params = new URLSearchParams();
@@ -44,6 +57,54 @@ export function AnalyticsPage() {
   const topDisruptionDays = correlations.data?.data?.topDisruptionDays || [];
   const topDurationDays = correlations.data?.data?.topDurationDays || [];
   const cityRollups = correlations.data?.data?.cityRollups || [];
+  const trendRows = useMemo(() => {
+    const trendMap = new Map();
+    for (const row of rows) {
+      if (!trendMap.has(row.dateKey)) {
+        trendMap.set(row.dateKey, {
+          dateKey: row.dateKey,
+          gigs: 0,
+          avgDurationMinutes: 0,
+          avgAmountPaid: 0,
+          disruptionScore: 0,
+          weatherSeverityScore: 0,
+          aqiSeverityScore: 0,
+          samples: 0
+        });
+      }
+      const bucket = trendMap.get(row.dateKey);
+      bucket.gigs += Number(row.gigs || 0);
+      bucket.avgDurationMinutes += Number(row.avgDurationMinutes || 0);
+      bucket.avgAmountPaid += Number(row.avgAmountPaid || 0);
+      bucket.disruptionScore += Number(row.disruptionScore || 0);
+      bucket.weatherSeverityScore += Number(row.weatherSeverityScore || 0);
+      bucket.aqiSeverityScore += Number(row.aqiSeverityScore || 0);
+      bucket.samples += 1;
+    }
+
+    return Array.from(trendMap.values())
+      .map((item) => ({
+        dateKey: item.dateKey.slice(5),
+        gigs: item.gigs,
+        avgDurationMinutes: Number((item.avgDurationMinutes / item.samples).toFixed(2)),
+        avgAmountPaid: Number((item.avgAmountPaid / item.samples).toFixed(2)),
+        disruptionScore: Number((item.disruptionScore / item.samples).toFixed(3)),
+        weatherSeverityScore: Number((item.weatherSeverityScore / item.samples).toFixed(3)),
+        aqiSeverityScore: Number((item.aqiSeverityScore / item.samples).toFixed(3))
+      }))
+      .sort((left, right) => left.dateKey.localeCompare(right.dateKey));
+  }, [rows]);
+
+  const scatterRows = useMemo(
+    () => rows.slice(0, 120).map((row) => ({
+      city: row.city,
+      platformName: row.platformName,
+      x: Number(row.disruptionScore || 0),
+      y: Number(row.avgDurationMinutes || 0),
+      z: Number(row.avgAmountPaid || 0)
+    })),
+    [rows]
+  );
 
   return (
     <div className="dashboard-stack">
@@ -67,6 +128,71 @@ export function AnalyticsPage() {
       </section>
 
       <section className="page-grid">
+        <ChartPanel
+          title="Disruption vs Duration"
+          caption="Trend of combined disruption and average delivery duration"
+        >
+          <ComposedChart data={trendRows}>
+            <CartesianGrid stroke="rgba(148, 163, 184, 0.15)" vertical={false} />
+            <XAxis dataKey="dateKey" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#38bdf8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#f97316" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <Tooltip
+              contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 12 }}
+              labelStyle={{ color: '#e5eef7' }}
+            />
+            <Area yAxisId="left" type="monotone" dataKey="disruptionScore" stroke="#38bdf8" fill="rgba(56,189,248,0.28)" />
+            <Line yAxisId="right" type="monotone" dataKey="avgDurationMinutes" stroke="#f97316" strokeWidth={2.5} dot={false} />
+          </ComposedChart>
+        </ChartPanel>
+
+        <ChartPanel
+          title="Gig Volume vs Payout"
+          caption="How volume and average payout move through the window"
+        >
+          <ComposedChart data={trendRows}>
+            <CartesianGrid stroke="rgba(148, 163, 184, 0.15)" vertical={false} />
+            <XAxis dataKey="dateKey" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#22c55e" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#facc15" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <Tooltip
+              contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 12 }}
+              labelStyle={{ color: '#e5eef7' }}
+            />
+            <Area yAxisId="left" type="monotone" dataKey="gigs" stroke="#22c55e" fill="rgba(34,197,94,0.25)" />
+            <Line yAxisId="right" type="monotone" dataKey="avgAmountPaid" stroke="#facc15" strokeWidth={2.5} dot={false} />
+          </ComposedChart>
+        </ChartPanel>
+
+        <ChartPanel
+          title="Disruption Correlation Cloud"
+          caption="Each point is a city-day-platform slice"
+        >
+          <ScatterChart>
+            <CartesianGrid stroke="rgba(148, 163, 184, 0.15)" />
+            <XAxis
+              type="number"
+              dataKey="x"
+              name="Disruption"
+              stroke="#94a3b8"
+              tick={{ fill: '#94a3b8', fontSize: 11 }}
+            />
+            <YAxis
+              type="number"
+              dataKey="y"
+              name="Avg Duration"
+              stroke="#94a3b8"
+              tick={{ fill: '#94a3b8', fontSize: 11 }}
+            />
+            <Tooltip
+              cursor={{ strokeDasharray: '3 3' }}
+              contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 12 }}
+              formatter={(value, name) => [value, name === 'x' ? 'Disruption' : name === 'y' ? 'Avg Duration' : name]}
+            />
+            <Scatter data={scatterRows} fill="#38bdf8" />
+          </ScatterChart>
+        </ChartPanel>
+
         <SparkBarList title="Top Cities by Gigs" items={cityRollups} valueKey="gigs" labelKey="city" formatter={formatNumber} />
         <PanelTable
           title="Top Disruption Days"
