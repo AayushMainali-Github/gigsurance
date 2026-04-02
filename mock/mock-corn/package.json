@@ -1,0 +1,19 @@
+{
+  "name": "mock-corn",
+  "version": "1.0.0",
+  "description": "Incremental live-updater for gigsurance mock datasets",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "tick": "node server.js --run-once"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "bson": "^6.10.4",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
+    "mongoose": "^9.3.3",
+    "seedrandom": "^3.0.5"
+  }
+}
