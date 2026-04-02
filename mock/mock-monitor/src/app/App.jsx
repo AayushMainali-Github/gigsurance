@@ -9,8 +9,8 @@ import { PlatformsPage } from '../features/platforms/PlatformsPage';
 import { DriversPage } from '../features/drivers/DriversPage';
 import { MapsPage } from '../features/maps/MapsPage';
 import { LivePage } from '../features/live/LivePage';
+import { AnalyticsPage } from '../features/analytics/AnalyticsPage';
 import { AlertsPage } from '../features/alerts/AlertsPage';
-import { PlaceholderPage } from '../features/layout/PlaceholderPage';
 
 export function App() {
   return (
@@ -26,6 +26,7 @@ export function App() {
         <Route path="/drivers" element={<DriversPage />} />
         <Route path="/maps" element={<MapsPage />} />
         <Route path="/live" element={<LivePage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
       </Routes>
     </AppShell>

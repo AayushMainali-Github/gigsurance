@@ -10,6 +10,7 @@ const navItems = [
   ['Cities', '/cities'],
   ['Drivers', '/drivers'],
   ['Live Orders', '/live'],
+  ['Analytics', '/analytics'],
   ['Maps', '/maps'],
   ['Alerts', '/alerts']
 ];

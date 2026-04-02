@@ -24,5 +24,7 @@ export const api = {
   getWeatherSnapshots: (query = '') => request(`/api/weather/snapshots${query ? `?${query}` : ''}`),
   getAqiSnapshots: (query = '') => request(`/api/aqi/snapshots${query ? `?${query}` : ''}`),
   getLiveOrders: (query = '') => request(`/api/live/orders${query ? `?${query}` : ''}`),
-  getLiveMetrics: (query = '') => request(`/api/live/metrics${query ? `?${query}` : ''}`)
+  getLiveMetrics: (query = '') => request(`/api/live/metrics${query ? `?${query}` : ''}`),
+  getAnalyticsCityDay: (query = '') => request(`/api/analytics/city-day${query ? `?${query}` : ''}`),
+  getAnalyticsCorrelations: (query = '') => request(`/api/analytics/correlations${query ? `?${query}` : ''}`)
 };

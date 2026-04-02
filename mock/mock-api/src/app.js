@@ -4,6 +4,7 @@ const weatherRoutes = require("./routes/weatherRoutes");
 const aqiRoutes = require("./routes/aqiRoutes");
 const metaRoutes = require("./routes/metaRoutes");
 const liveRoutes = require("./routes/liveRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 function createApp() {
   const app = express();
@@ -18,6 +19,7 @@ function createApp() {
   app.use("/api/weather", weatherRoutes);
   app.use("/api/aqi", aqiRoutes);
   app.use("/api/live", liveRoutes);
+  app.use("/api/analytics", analyticsRoutes);
 
   app.use((error, _req, res, _next) => {
     console.error("[mock-api] request failed", error);
