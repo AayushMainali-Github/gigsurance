@@ -7,6 +7,7 @@ import { AqiPage } from '../features/aqi/AqiPage';
 import { CitiesPage } from '../features/cities/CitiesPage';
 import { PlatformsPage } from '../features/platforms/PlatformsPage';
 import { DriversPage } from '../features/drivers/DriversPage';
+import { MapsPage } from '../features/maps/MapsPage';
 import { PlaceholderPage } from '../features/layout/PlaceholderPage';
 
 export function App() {
@@ -21,8 +22,8 @@ export function App() {
         <Route path="/platforms" element={<PlatformsPage />} />
         <Route path="/cities" element={<CitiesPage />} />
         <Route path="/drivers" element={<DriversPage />} />
+        <Route path="/maps" element={<MapsPage />} />
         <Route path="/live" element={<PlaceholderPage title="Live Orders" description="Real-time order monitoring will be added once live endpoints are expanded." />} />
-        <Route path="/maps" element={<PlaceholderPage title="Maps" description="Geospatial command views will land in the next phase." />} />
         <Route path="/alerts" element={<PlaceholderPage title="Alerts" description="Alerting and anomaly detection will land in the next phase." />} />
       </Routes>
     </AppShell>

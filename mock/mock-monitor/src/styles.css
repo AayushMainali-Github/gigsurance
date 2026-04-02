@@ -80,3 +80,12 @@ th { color: #94a3b8; font-weight: 600; }
 
 .mini-button { border: 0; border-radius: 10px; padding: 6px 10px; background: rgba(56, 189, 248, 0.14); color: #e0f2fe; cursor: pointer; }
 
+
+.map-layout { align-items: start; }
+.map-panel { min-height: 620px; }
+.map-frame { height: 540px; border-radius: 16px; overflow: hidden; }
+.leaflet-host { height: 100%; width: 100%; }
+.mode-switch { display: flex; gap: 8px; flex-wrap: wrap; }
+.active-pill { background: #0ea5e9; color: #04111d; }
+.map-popup { color: #111827; }
+
