@@ -4,6 +4,9 @@ import { OverviewPage } from '../features/overview/OverviewPage';
 import { DeliveryPage } from '../features/delivery/DeliveryPage';
 import { WeatherPage } from '../features/weather/WeatherPage';
 import { AqiPage } from '../features/aqi/AqiPage';
+import { CitiesPage } from '../features/cities/CitiesPage';
+import { PlatformsPage } from '../features/platforms/PlatformsPage';
+import { DriversPage } from '../features/drivers/DriversPage';
 import { PlaceholderPage } from '../features/layout/PlaceholderPage';
 
 export function App() {
@@ -15,9 +18,9 @@ export function App() {
         <Route path="/delivery" element={<DeliveryPage />} />
         <Route path="/weather" element={<WeatherPage />} />
         <Route path="/aqi" element={<AqiPage />} />
-        <Route path="/platforms" element={<PlaceholderPage title="Platforms" description="Platform intelligence workspace will land in the next phase." />} />
-        <Route path="/cities" element={<PlaceholderPage title="Cities" description="City drilldowns and dashboard cards will land in the next phase." />} />
-        <Route path="/drivers" element={<PlaceholderPage title="Drivers" description="Driver-level investigative workflows will land in the next phase." />} />
+        <Route path="/platforms" element={<PlatformsPage />} />
+        <Route path="/cities" element={<CitiesPage />} />
+        <Route path="/drivers" element={<DriversPage />} />
         <Route path="/live" element={<PlaceholderPage title="Live Orders" description="Real-time order monitoring will be added once live endpoints are expanded." />} />
         <Route path="/maps" element={<PlaceholderPage title="Maps" description="Geospatial command views will land in the next phase." />} />
         <Route path="/alerts" element={<PlaceholderPage title="Alerts" description="Alerting and anomaly detection will land in the next phase." />} />
