@@ -38,4 +38,10 @@ const AqiSnapshot = mongoose.models.CornAqiSnapshot || mongoose.model("CornAqiSn
   no2: Number, so2: Number, o3: Number, co: Number, severityScore: Number
 }, { collection: "aqi_snapshots", versionKey: false }));
 
-module.exports = { DeliveryDriver, WeatherSnapshot, AqiSnapshot };
+const CornState = mongoose.models.CornState || mongoose.model("CornState", new mongoose.Schema({
+  key: { type: String, unique: true },
+  value: mongoose.Schema.Types.Mixed,
+  updatedAt: { type: Date, default: Date.now }
+}, { collection: "mock_corn_state", versionKey: false }));
+
+module.exports = { DeliveryDriver, WeatherSnapshot, AqiSnapshot, CornState };

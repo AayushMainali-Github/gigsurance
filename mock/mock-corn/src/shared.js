@@ -6,6 +6,7 @@ dayjs.extend(utc);
 
 const { cities } = require("../../mock-db/config/cities");
 const { PLATFORM_MIX_BY_TIER, PLATFORMS, isFood, isLogistics, isQuickCommerce } = require("../../mock-db/config/platforms");
+const { buildCityAssets } = require("../../mock-db/utils/city-assets");
 
 function createRng(seed) {
   const r = seedrandom(String(seed));
@@ -30,6 +31,9 @@ function createRng(seed) {
       while (!u) u = r();
       while (!v) v = r();
       return mean + Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v) * std;
+    },
+    child(label) {
+      return createRng(`${seed}:${label}`);
     }
   };
 }
@@ -38,10 +42,8 @@ function dateKey(ts) { return dayjs.utc(ts).format("YYYY-MM-DD"); }
 function nowUtc() { return dayjs.utc(); }
 function floorToStep(ts, minutes) {
   const d = dayjs.utc(ts);
-  const floored = d.minute(Math.floor(d.minute() / minutes) * minutes).second(0).millisecond(0);
-  return floored;
+  return d.minute(Math.floor(d.minute() / minutes) * minutes).second(0).millisecond(0);
 }
-
 function randomPointWithinRadius(city, rng, bias = 0.82) {
   const angle = rng.float(0, Math.PI * 2);
   const radius = city.radiusKm * Math.sqrt(rng.next()) * bias;
@@ -61,5 +63,5 @@ function categoryFromAqi(aqi) {
 
 module.exports = {
   cities, PLATFORMS, PLATFORM_MIX_BY_TIER, isFood, isLogistics, isQuickCommerce,
-  createRng, dateKey, nowUtc, floorToStep, randomPointWithinRadius, makePoint, categoryFromAqi, calculateObjectSize, dayjs
+  createRng, dateKey, nowUtc, floorToStep, randomPointWithinRadius, makePoint, categoryFromAqi, calculateObjectSize, dayjs, buildCityAssets
 };

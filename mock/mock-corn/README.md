@@ -6,8 +6,8 @@ It does not reseed the database. It keeps the existing collections moving forwar
 
 - appends missing `weather_snapshots` every 30 minutes
 - appends missing `aqi_snapshots` every 6 hours
-- adds a few new delivery drivers each cycle
-- appends fresh gigs to a sampled set of existing drivers
+- adds new delivery drivers once per city per day by tier
+- appends fresh gigs to a sampled set of existing drivers each cycle
 
 ## Setup
 
@@ -32,6 +32,10 @@ npm run tick
 ## Notes
 
 - weather and AQI jobs backfill any missing slots up to the current time
-- delivery job is incremental, not a full rebuild
+- weather and AQI generation follows the same formulas as the seeded mock-db generators
+- delivery behavior follows the same platform and disruption logic as the seeded mock-db generators
+- new drivers are added once per city per day using tier-based growth
+- `tier1`: 4-5 new drivers per city per day
+- `tier2`: 2-3 new drivers per city per day
+- `tier3`: 1 new driver per city per day
 - delivery appends only to a sampled set of drivers per cycle to keep the worker bounded
-- new drivers are added gradually using city and tier-weighted platform mix
