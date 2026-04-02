@@ -9,6 +9,7 @@ import { PlatformsPage } from '../features/platforms/PlatformsPage';
 import { DriversPage } from '../features/drivers/DriversPage';
 import { MapsPage } from '../features/maps/MapsPage';
 import { LivePage } from '../features/live/LivePage';
+import { AlertsPage } from '../features/alerts/AlertsPage';
 import { PlaceholderPage } from '../features/layout/PlaceholderPage';
 
 export function App() {
@@ -25,7 +26,7 @@ export function App() {
         <Route path="/drivers" element={<DriversPage />} />
         <Route path="/maps" element={<MapsPage />} />
         <Route path="/live" element={<LivePage />} />
-        <Route path="/alerts" element={<PlaceholderPage title="Alerts" description="Alerting and anomaly detection will land in the next phase." />} />
+        <Route path="/alerts" element={<AlertsPage />} />
       </Routes>
     </AppShell>
   );
