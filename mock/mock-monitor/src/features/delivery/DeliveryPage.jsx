@@ -3,6 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
 import { formatNumber } from '../../lib/utils/format';
+import { StatCard } from '../../components/StatCard';
+import { PanelTable } from '../../components/PanelTable';
+import { SparkBarList } from '../../components/SparkBarList';
 
 export function DeliveryPage() {
   const { city, platformName, state } = useMonitorFilters();
@@ -20,53 +23,50 @@ export function DeliveryPage() {
   const summaryQuery = useQuery({ queryKey: ['delivery-summary', query], queryFn: () => api.getDeliverySummary(query) });
 
   const drivers = driversQuery.data?.data || [];
+  const totalDrivers = driversQuery.data?.total || 0;
   const driverCounts = summaryQuery.data?.data?.driverCounts || [];
   const historyStats = summaryQuery.data?.data?.historyStats || [];
+  const totalGigs = historyStats.reduce((sum, item) => sum + Number(item.gigs || 0), 0);
+  const weightedPay = historyStats.reduce((sum, item) => sum + Number(item.avgAmountPaid || 0) * Number(item.gigs || 0), 0);
+  const weightedDuration = historyStats.reduce((sum, item) => sum + Number(item.avgDurationMinutes || 0) * Number(item.gigs || 0), 0);
 
   return (
-    <div className="page-grid">
-      <section className="card panel">
-        <div className="panel-header"><h2>Driver Slice</h2><span>{formatNumber(driversQuery.data?.total || 0)} matching drivers</span></div>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Driver</th><th>Platform</th><th>City</th><th>Tier</th><th>Archetype</th></tr></thead>
-            <tbody>
-              {drivers.map((item) => (
-                <tr key={`${item.platformName}-${item.platformDriverId}`}>
-                  <td>{item.platformDriverId}</td><td>{item.platformName}</td><td>{item.city}</td><td>{item.cityTier}</td><td>{item.driverProfile?.archetype}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="dashboard-stack">
+      <section className="metric-grid">
+        <StatCard title="Matching Drivers" value={formatNumber(totalDrivers)} subtitle="Filtered active driver base" tone="accent" />
+        <StatCard title="Tracked Gigs" value={formatNumber(totalGigs)} subtitle="Across the current result slice" />
+        <StatCard title="Avg Payout" value={totalGigs ? (weightedPay / totalGigs).toFixed(2) : '0.00'} subtitle="Weighted by platform gig volume" />
+        <StatCard title="Avg Duration" value={totalGigs ? (weightedDuration / totalGigs).toFixed(2) : '0.00'} subtitle="Weighted delivery duration" />
       </section>
 
-      <section className="card panel">
-        <div className="panel-header"><h2>Driver Counts by Platform</h2></div>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Platform</th><th>Drivers</th></tr></thead>
-            <tbody>
-              {driverCounts.map((item) => (
-                <tr key={item._id}><td>{item._id}</td><td>{formatNumber(item.drivers)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="card panel span-2">
-        <div className="panel-header"><h2>Gig Metrics by Platform</h2></div>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Platform</th><th>Gigs</th><th>Avg Pay</th><th>Avg Duration</th></tr></thead>
-            <tbody>
-              {historyStats.map((item) => (
-                <tr key={item._id}><td>{item._id}</td><td>{formatNumber(item.gigs)}</td><td>{Number(item.avgAmountPaid || 0).toFixed(2)}</td><td>{Number(item.avgDurationMinutes || 0).toFixed(2)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <section className="page-grid">
+        <SparkBarList title="Driver Counts by Platform" items={driverCounts} valueKey="drivers" labelKey="_id" formatter={formatNumber} />
+        <PanelTable
+          title="Gig Metrics by Platform"
+          caption="Pay and duration performance"
+          rows={historyStats}
+          rowKey={(row) => row._id}
+          columns={[
+            { key: 'platform', label: 'Platform', render: (row) => row._id },
+            { key: 'gigs', label: 'Gigs', render: (row) => formatNumber(row.gigs) },
+            { key: 'pay', label: 'Avg Pay', render: (row) => Number(row.avgAmountPaid || 0).toFixed(2) },
+            { key: 'duration', label: 'Avg Duration', render: (row) => Number(row.avgDurationMinutes || 0).toFixed(2) }
+          ]}
+        />
+        <PanelTable
+          title="Driver Slice"
+          caption="Most recent joined drivers in the current filter state"
+          rows={drivers}
+          rowKey={(row) => `${row.platformName}-${row.platformDriverId}`}
+          columns={[
+            { key: 'driver', label: 'Driver', render: (row) => row.platformDriverId },
+            { key: 'platform', label: 'Platform', render: (row) => row.platformName },
+            { key: 'city', label: 'City', render: (row) => row.city },
+            { key: 'tier', label: 'Tier', render: (row) => row.cityTier },
+            { key: 'archetype', label: 'Archetype', render: (row) => row.driverProfile?.archetype },
+            { key: 'sensitivity', label: 'Sensitivity', render: (row) => row.driverProfile?.weatherSensitivity }
+          ]}
+        />
       </section>
     </div>
   );

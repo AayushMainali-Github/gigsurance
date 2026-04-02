@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
+import { StatCard } from '../../components/StatCard';
+import { PanelTable } from '../../components/PanelTable';
 
 export function WeatherPage() {
   const { city, state } = useMonitorFilters();
@@ -18,34 +20,44 @@ export function WeatherPage() {
   const snapshotsQuery = useQuery({ queryKey: ['weather-snapshots', query], queryFn: () => api.getWeatherSnapshots(query) });
   const latestItems = Array.isArray(latestQuery.data?.data) ? latestQuery.data.data.slice(0, 10) : latestQuery.data?.data ? [latestQuery.data.data] : [];
   const snapshots = snapshotsQuery.data?.data || [];
+  const avgSeverity = latestItems.length ? (latestItems.reduce((sum, item) => sum + Number(item.weatherSeverityScore || 0), 0) / latestItems.length).toFixed(3) : '0.000';
+  const avgRain = snapshots.length ? (snapshots.reduce((sum, item) => sum + Number(item.rainMm || 0), 0) / snapshots.length).toFixed(2) : '0.00';
 
   return (
-    <div className="page-grid">
-      <section className="card panel">
-        <div className="panel-header"><h2>Latest Weather</h2></div>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>City</th><th>Condition</th><th>Temp</th><th>Severity</th></tr></thead>
-            <tbody>
-              {latestItems.map((item) => (
-                <tr key={`${item.city}-${item.tsUnix}`}><td>{item.city}</td><td>{item.conditionMain}</td><td>{item.tempC}</td><td>{item.weatherSeverityScore}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="dashboard-stack">
+      <section className="metric-grid">
+        <StatCard title="Latest Cities Visible" value={String(latestItems.length)} subtitle="Latest weather cards in current scope" tone="accent" />
+        <StatCard title="Avg Severity" value={avgSeverity} subtitle="Across the latest visible cities" />
+        <StatCard title="Avg Rain" value={avgRain} subtitle="Across recent snapshot rows" />
+        <StatCard title="Recent Rows" value={String(snapshots.length)} subtitle="Weather rows in the current list" />
       </section>
-      <section className="card panel span-2">
-        <div className="panel-header"><h2>Recent Weather Snapshots</h2></div>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>City</th><th>Time</th><th>Rain</th><th>Wind</th><th>Heat Risk</th></tr></thead>
-            <tbody>
-              {snapshots.map((item) => (
-                <tr key={`${item.city}-${item.tsUnix}`}><td>{item.city}</td><td>{item.tsUnix}</td><td>{item.rainMm}</td><td>{item.windKph}</td><td>{item.heatRisk}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+
+      <section className="page-grid">
+        <PanelTable
+          title="Latest Weather"
+          caption="Most recent city readings"
+          rows={latestItems}
+          rowKey={(row) => `${row.city}-${row.tsUnix}`}
+          columns={[
+            { key: 'city', label: 'City', render: (row) => row.city },
+            { key: 'condition', label: 'Condition', render: (row) => row.conditionMain },
+            { key: 'temp', label: 'Temp', render: (row) => `${row.tempC} C` },
+            { key: 'severity', label: 'Severity', render: (row) => row.weatherSeverityScore }
+          ]}
+        />
+        <PanelTable
+          title="Recent Weather Snapshots"
+          caption="Recent operational weather rows"
+          rows={snapshots}
+          rowKey={(row) => `${row.city}-${row.tsUnix}`}
+          columns={[
+            { key: 'city', label: 'City', render: (row) => row.city },
+            { key: 'time', label: 'Time', render: (row) => row.tsUnix },
+            { key: 'rain', label: 'Rain', render: (row) => row.rainMm },
+            { key: 'wind', label: 'Wind', render: (row) => row.windKph },
+            { key: 'heat', label: 'Heat Risk', render: (row) => row.heatRisk }
+          ]}
+        />
       </section>
     </div>
   );
