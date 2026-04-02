@@ -22,5 +22,7 @@ export const api = {
   getWeatherLatest: (city) => request(`/api/weather/latest${city ? `?city=${encodeURIComponent(city)}` : ''}`),
   getAqiLatest: (city) => request(`/api/aqi/latest${city ? `?city=${encodeURIComponent(city)}` : ''}`),
   getWeatherSnapshots: (query = '') => request(`/api/weather/snapshots${query ? `?${query}` : ''}`),
-  getAqiSnapshots: (query = '') => request(`/api/aqi/snapshots${query ? `?${query}` : ''}`)
+  getAqiSnapshots: (query = '') => request(`/api/aqi/snapshots${query ? `?${query}` : ''}`),
+  getLiveOrders: (query = '') => request(`/api/live/orders${query ? `?${query}` : ''}`),
+  getLiveMetrics: (query = '') => request(`/api/live/metrics${query ? `?${query}` : ''}`)
 };

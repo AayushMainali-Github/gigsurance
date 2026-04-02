@@ -8,6 +8,7 @@ import { CitiesPage } from '../features/cities/CitiesPage';
 import { PlatformsPage } from '../features/platforms/PlatformsPage';
 import { DriversPage } from '../features/drivers/DriversPage';
 import { MapsPage } from '../features/maps/MapsPage';
+import { LivePage } from '../features/live/LivePage';
 import { PlaceholderPage } from '../features/layout/PlaceholderPage';
 
 export function App() {
@@ -23,7 +24,7 @@ export function App() {
         <Route path="/cities" element={<CitiesPage />} />
         <Route path="/drivers" element={<DriversPage />} />
         <Route path="/maps" element={<MapsPage />} />
-        <Route path="/live" element={<PlaceholderPage title="Live Orders" description="Real-time order monitoring will be added once live endpoints are expanded." />} />
+        <Route path="/live" element={<LivePage />} />
         <Route path="/alerts" element={<PlaceholderPage title="Alerts" description="Alerting and anomaly detection will land in the next phase." />} />
       </Routes>
     </AppShell>
