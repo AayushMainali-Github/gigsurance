@@ -13,7 +13,6 @@ test("weekly premium run produces quoted decision and progress callbacks", async
   const mlClient = freshRequire("services/mlClient.js");
   const ledgerService = freshRequire("services/ledgerService.js");
   const riskReviewService = freshRequire("services/riskReviewService.js");
-  const weeklyPremiumService = freshRequire("services/weeklyPremiumService.js");
 
   let decisionPayload = null;
   let invoicePayload = null;
@@ -57,6 +56,7 @@ test("weekly premium run produces quoted decision and progress callbacks", async
   const restoreReview = stubMethods(riskReviewService, {
     createPremiumReviewCase: async () => null
   });
+  const weeklyPremiumService = freshRequire("services/weeklyPremiumService.js");
 
   try {
     const result = await weeklyPremiumService.processWeeklyPremiumRun({

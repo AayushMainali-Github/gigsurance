@@ -92,6 +92,10 @@ async function failJobRun(idempotencyKey, lockToken, errorSummary, patch = {}) {
   });
 }
 
+async function getJobRunByWindow(jobName, scheduledFor) {
+  return ScheduledJobRun.findOne({ jobName, scheduledFor }).lean();
+}
+
 function assertOwnedRun(runState) {
   if (!runState?.acquired) {
     throw new ApiError(409, `Job run not acquired: ${runState?.reason || "unknown"}`);
@@ -103,5 +107,6 @@ module.exports = {
   heartbeatJobRun,
   finishJobRun,
   failJobRun,
+  getJobRunByWindow,
   assertOwnedRun
 };

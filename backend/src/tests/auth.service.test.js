@@ -8,14 +8,14 @@ setTestEnv();
 test("signup hashes password and returns token", async () => {
   const User = freshRequire("models/User.js");
   const workersService = freshRequire("modules/workers/workers.service.js");
+  const restore = stubMethods(User, {
+    findOne: () => ({ lean: async () => null }),
+    create: async ({ email, passwordHash }) => ({ ...userFixture, email, passwordHash })
+  });
   const restoreWorkers = stubMethods(workersService, {
     linkWorkerToUser: async () => ({ _id: "worker-link-1" })
   });
   const authService = freshRequire("modules/auth/auth.service.js");
-  const restore = stubMethods(User, {
-    findOne: async () => null,
-    create: async ({ email, passwordHash }) => ({ ...userFixture, email, passwordHash })
-  });
 
   try {
     const result = await authService.signup({

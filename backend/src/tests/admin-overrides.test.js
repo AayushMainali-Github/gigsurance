@@ -9,7 +9,6 @@ test("overridePremiumDecision updates invoice, policy, and audit trail", async (
   const WeeklyPremiumDecision = freshRequire("models/WeeklyPremiumDecision.js");
   const PremiumInvoice = freshRequire("models/PremiumInvoice.js");
   const Policy = freshRequire("models/Policy.js");
-  const adminService = freshRequire("services/adminService.js");
   const auditLogService = freshRequire("services/auditLogService.js");
   const ledgerService = freshRequire("services/ledgerService.js");
 
@@ -23,7 +22,8 @@ test("overridePremiumDecision updates invoice, policy, and audit trail", async (
     manualReviewFlag: true,
     status: "pending",
     finalDecisionSnapshot: {},
-    async save() { return this; }
+    async save() { return this; },
+    toObject() { return this; }
   };
   let invoicePatch = null;
   let policyPatch = null;
@@ -45,6 +45,7 @@ test("overridePremiumDecision updates invoice, policy, and audit trail", async (
   const restoreLedger = stubMethods(ledgerService, {
     writeLedgerEntry: async (payload) => { ledgerWritten = payload; return payload; }
   });
+  const adminService = freshRequire("services/adminService.js");
 
   try {
     const result = await adminService.overridePremiumDecision({

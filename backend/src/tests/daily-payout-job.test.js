@@ -8,13 +8,13 @@ setTestEnv();
 test("daily payout run produces payout decision and transaction", async () => {
   const Policy = freshRequire("models/Policy.js");
   const LinkedWorker = freshRequire("models/LinkedWorker.js");
+  const IncidentWindow = freshRequire("models/IncidentWindow.js");
   const DailyPayoutDecision = freshRequire("models/DailyPayoutDecision.js");
   const PayoutTransaction = freshRequire("models/PayoutTransaction.js");
   const mlClient = freshRequire("services/mlClient.js");
   const incidentDetectionService = freshRequire("services/incidentDetectionService.js");
   const ledgerService = freshRequire("services/ledgerService.js");
   const riskReviewService = freshRequire("services/riskReviewService.js");
-  const dailyPayoutService = freshRequire("services/dailyPayoutService.js");
 
   let decisionPayload = null;
   let txPayload = null;
@@ -55,6 +55,9 @@ test("daily payout run produces payout decision and transaction", async () => {
     previousDay: () => incidentFixture.date,
     detectIncidentsForDate: async () => ([incidentFixture])
   });
+  const restoreIncidentWindow = stubMethods(IncidentWindow, {
+    findOneAndUpdate: async (_filter, patch) => ({ ...incidentFixture, ...patch.$set })
+  });
   const restoreLedger = stubMethods(ledgerService, {
     writeLedgerEntries: async () => [],
     snapshotGlobalBalance: async () => null
@@ -62,6 +65,7 @@ test("daily payout run produces payout decision and transaction", async () => {
   const restoreReview = stubMethods(riskReviewService, {
     createPayoutReviewCase: async () => null
   });
+  const dailyPayoutService = freshRequire("services/dailyPayoutService.js");
 
   try {
     const result = await dailyPayoutService.processDailyPayoutRun({
@@ -78,6 +82,7 @@ test("daily payout run produces payout decision and transaction", async () => {
     restoreTx();
     restoreMl();
     restoreIncident();
+    restoreIncidentWindow();
     restoreLedger();
     restoreReview();
   }

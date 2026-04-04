@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const { connectDb } = require("./src/config/db");
 const { buildApp } = require("./src/app");
-const { startScheduler } = require("./src/scheduler");
+const { startScheduler, runLatestCatchupJobs } = require("./src/scheduler");
 const { config } = require("./src/config/env");
 const { logger } = require("./src/config/logger");
 
@@ -15,6 +15,7 @@ async function bootstrap() {
   });
 
   if (config.enableScheduler) {
+    await runLatestCatchupJobs(new Date());
     startScheduler();
   }
 

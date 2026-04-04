@@ -16,8 +16,8 @@ test("linkWorkerToUser links operational worker to user", async () => {
     findById: async () => mutableUser
   });
   const restoreLinked = stubMethods(LinkedWorker, {
-    findById: async () => null,
-    findOne: async () => null,
+    findById: () => ({ lean: async () => null }),
+    findOne: () => ({ lean: async () => null }),
     findOneAndUpdate: async () => ({ ...linkedWorkerFixture })
   });
   const restoreExternal = stubMethods(mockApiClient, {

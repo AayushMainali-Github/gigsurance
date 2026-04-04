@@ -219,6 +219,12 @@ backend/
   - runs daily at `00:30`
   - records reminders for stale open review cases
 
+On backend startup, the latest missing windows are also checked once:
+- current weekly premium window
+- latest daily payout window for yesterday
+
+Those are only run if `scheduled_job_runs` does not already show a completed run for that window.
+
 ## Reliability Rules
 
 - scheduler uses `scheduled_job_runs` as the durable lock and progress store
