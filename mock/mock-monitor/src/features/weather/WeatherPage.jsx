@@ -24,7 +24,7 @@ export function WeatherPage() {
   const avgRain = snapshots.length ? (snapshots.reduce((sum, item) => sum + Number(item.rainMm || 0), 0) / snapshots.length).toFixed(2) : '0.00';
 
   return (
-    <div className="dashboard-stack">
+    <div className="dashboard-stack page-surface">
       <section className="hero card">
         <div>
           <span className="eyebrow">Weather Monitoring</span>

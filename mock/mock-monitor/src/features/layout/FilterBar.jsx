@@ -38,7 +38,7 @@ export function FilterBar() {
 
   return (
     <section className="filter-bar card">
-      <div className="filter-copy">
+      <div className="filter-copy panel-heading">
         <span className="eyebrow">Scope</span>
         <p>Focus the monitor by city, platform, or state. All data views update in place.</p>
       </div>

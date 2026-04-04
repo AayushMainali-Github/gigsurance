@@ -27,10 +27,12 @@ export function ChartPanel({ title, caption, children }) {
           {caption ? <span className="panel-caption">{caption}</span> : null}
         </div>
       </div>
-      <div className="chart-wrap">
+      <div className="chart-shell">
+        <div className="chart-wrap">
         <ResponsiveContainer width="100%" height="100%">
           {children}
         </ResponsiveContainer>
+        </div>
       </div>
     </section>
   );

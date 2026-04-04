@@ -200,7 +200,7 @@ export function AlertsPage() {
     .filter((item) => item.alerts > 0);
 
   return (
-    <div className="dashboard-stack">
+    <div className="dashboard-stack page-surface">
       <section className="hero card">
         <div>
           <span className="eyebrow">Operational Alerts</span>
@@ -253,17 +253,17 @@ export function AlertsPage() {
             </div>
           </div>
           <div className="live-notes">
-            <div className="live-note">
+            <div className="live-note special-note">
               <Cloud size={16} strokeWidth={2} />
               <strong>Weather</strong>
               <span>Triggers on high severity, storm, and visibility deterioration.</span>
             </div>
-            <div className="live-note">
+            <div className="live-note special-note">
               <Wind size={16} strokeWidth={2} />
               <strong>AQI</strong>
               <span>Triggers on very poor and severe air quality bands with stronger priority for severe conditions.</span>
             </div>
-            <div className="live-note">
+            <div className="live-note special-note">
               <Truck size={16} strokeWidth={2} />
               <strong>Delivery</strong>
               <span>Triggers on unusually high concurrency, duration elevation, and concentrated city or platform pressure.</span>

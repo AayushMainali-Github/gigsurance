@@ -31,7 +31,7 @@ export function DeliveryPage() {
   const weightedDuration = historyStats.reduce((sum, item) => sum + Number(item.avgDurationMinutes || 0) * Number(item.gigs || 0), 0);
 
   return (
-    <div className="dashboard-stack">
+    <div className="dashboard-stack page-surface">
       <section className="hero card">
         <div>
           <span className="eyebrow">Delivery Operations</span>

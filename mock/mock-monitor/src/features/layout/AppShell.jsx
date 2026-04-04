@@ -1,31 +1,18 @@
-import {
-  Bell,
-  BarChart3,
-  Cloud,
-  Layers3,
-  LayoutDashboard,
-  Map,
-  MapPin,
-  ShoppingCart,
-  Truck,
-  Users,
-  Wind
-} from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { FilterBar } from './FilterBar';
 
 const navItems = [
-  { label: 'Overview', to: '/overview', description: 'Network health and key aggregates', icon: LayoutDashboard, group: 'core' },
-  { label: 'Delivery Ops', to: '/delivery', description: 'Fleet and payout activity', icon: Truck, group: 'core' },
-  { label: 'Live Orders', to: '/live', description: 'Current order flow and alerts', icon: ShoppingCart, group: 'core' },
-  { label: 'Drivers', to: '/drivers', description: 'Driver profiles and exposure', icon: Users, group: 'core' },
-  { label: 'Cities', to: '/cities', description: 'City-level operating view', icon: MapPin, group: 'network' },
-  { label: 'Platforms', to: '/platforms', description: 'Platform mix and coverage', icon: Layers3, group: 'network' },
-  { label: 'Weather', to: '/weather', description: 'Operational weather conditions', icon: Cloud, group: 'signals' },
-  { label: 'AQI', to: '/aqi', description: 'Air quality pressure by city', icon: Wind, group: 'signals' },
-  { label: 'Analytics', to: '/analytics', description: 'Joined performance relationships', icon: BarChart3, group: 'insight' },
-  { label: 'Maps', to: '/maps', description: 'Geographic monitoring surface', icon: Map, group: 'insight' },
-  { label: 'Alerts', to: '/alerts', description: 'Signals requiring attention', icon: Bell, group: 'insight' }
+  { label: 'Overview', to: '/overview', description: 'Network health and key aggregates', group: 'core' },
+  { label: 'Delivery Ops', to: '/delivery', description: 'Fleet and payout activity', group: 'core' },
+  { label: 'Live Orders', to: '/live', description: 'Current order flow and alerts', group: 'core' },
+  { label: 'Drivers', to: '/drivers', description: 'Driver profiles and exposure', group: 'core' },
+  { label: 'Cities', to: '/cities', description: 'City-level operating view', group: 'network' },
+  { label: 'Platforms', to: '/platforms', description: 'Platform mix and coverage', group: 'network' },
+  { label: 'Weather', to: '/weather', description: 'Operational weather conditions', group: 'signals' },
+  { label: 'AQI', to: '/aqi', description: 'Air quality pressure by city', group: 'signals' },
+  { label: 'Analytics', to: '/analytics', description: 'Joined performance relationships', group: 'insight' },
+  { label: 'Maps', to: '/maps', description: 'Geographic monitoring surface', group: 'insight' },
+  { label: 'Alerts', to: '/alerts', description: 'Signals requiring attention', group: 'insight' }
 ];
 
 const routeMeta = Object.fromEntries(
@@ -46,7 +33,7 @@ export function AppShell({ children }) {
           <div className="brand-mark">MM</div>
           <div>
             <div className="brand-title">
-              Mock Monitor
+              Gigsurance mock-monitor
               <span className="brand-status-dot" aria-hidden="true" />
             </div>
             <div className="brand-subtitle">Monitoring Workspace</div>
@@ -57,12 +44,11 @@ export function AppShell({ children }) {
           <p>Cleaner read paths for weather, fleet, payout, and city-level mock signals.</p>
         </div>
         <nav className="nav">
-          {navItems.map(({ label, to, description, icon: Icon, group }, index) => (
+          {navItems.map(({ label, to, description, group }, index) => (
             <div key={to}>
               {index > 0 && navItems[index - 1].group !== group ? <div className="nav-divider" /> : null}
               <NavLink to={to} className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>
                 <span className="nav-link-main">
-                  <Icon size={16} strokeWidth={2} />
                   <span className="nav-link-label">{label}</span>
                 </span>
                 <span className="nav-link-description">{description}</span>

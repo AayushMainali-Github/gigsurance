@@ -33,7 +33,7 @@ export function SparkBarList({ title, items, valueKey, labelKey, formatter = (va
           return (
             <div key={`${item[labelKey]}-${value}`} className="bar-row">
               <div className="bar-row-head">
-                <span>{item[labelKey]}</span>
+                <span className="bar-row-label">{item[labelKey]}</span>
                 <strong>{formatter(value)}</strong>
               </div>
               <div className="bar-track"><div className="bar-fill" style={{ width: `${width}%` }} /></div>

@@ -20,7 +20,7 @@ export function CitiesPage() {
   const summary = summaryQuery.data?.data;
 
   return (
-    <div className="dashboard-stack">
+    <div className="dashboard-stack page-surface">
       <section className="hero card">
         <div>
           <span className="eyebrow">City Monitoring</span>

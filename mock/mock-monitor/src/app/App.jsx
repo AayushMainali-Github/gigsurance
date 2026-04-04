@@ -18,9 +18,11 @@ const AnalyticsPage = lazy(() => import('../features/analytics/AnalyticsPage').t
 function RouteLoader() {
   return (
     <section className="card placeholder-card route-loader">
-      <div className="panel-title-row">
-        <span className="panel-icon"><LoaderCircle size={18} strokeWidth={2} /></span>
-        <h2>Loading workspace</h2>
+      <div className="panel-heading">
+        <div className="panel-title-row">
+          <span className="panel-icon"><LoaderCircle size={18} strokeWidth={2} /></span>
+          <h2>Loading workspace</h2>
+        </div>
       </div>
       <p>The selected monitor surface is being loaded.</p>
     </section>

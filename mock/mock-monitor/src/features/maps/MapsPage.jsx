@@ -130,7 +130,7 @@ export function MapsPage() {
     .slice(0, 12);
 
   return (
-    <div className="dashboard-stack">
+    <div className="dashboard-stack page-surface">
       <section className="hero card">
         <div>
           <span className="eyebrow">Geographic Monitoring</span>
@@ -186,12 +186,29 @@ export function MapsPage() {
                     <Popup>
                       <div className="map-popup">
                         <strong>{city.city}</strong>
-                        <div>{city.state}</div>
-                        <div>Drivers: {formatNumber(city.drivers)}</div>
-                        <div>Live orders: {formatNumber(city.live?.liveOrders || 0)}</div>
-                        <div>Disruption: {city.disruption?.disruptionScore ?? '-'}</div>
-                        <div>Weather severity: {city.weather?.weatherSeverityScore ?? '-'}</div>
-                        <div>AQI: {city.aqi?.aqi ?? '-'}</div>
+                        <span className="map-popup-subtitle">{city.state}</span>
+                        <div className="map-popup-grid">
+                          <div className="map-popup-item">
+                            <span>Drivers</span>
+                            <b>{formatNumber(city.drivers)}</b>
+                          </div>
+                          <div className="map-popup-item">
+                            <span>Live Orders</span>
+                            <b>{formatNumber(city.live?.liveOrders || 0)}</b>
+                          </div>
+                          <div className="map-popup-item">
+                            <span>Disruption</span>
+                            <b>{city.disruption?.disruptionScore ?? '-'}</b>
+                          </div>
+                          <div className="map-popup-item">
+                            <span>Weather</span>
+                            <b>{city.weather?.weatherSeverityScore ?? '-'}</b>
+                          </div>
+                          <div className="map-popup-item map-popup-item-wide">
+                            <span>AQI</span>
+                            <b>{city.aqi?.aqi ?? '-'}</b>
+                          </div>
+                        </div>
                       </div>
                     </Popup>
                   </CircleMarker>

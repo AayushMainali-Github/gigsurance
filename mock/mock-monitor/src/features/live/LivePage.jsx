@@ -61,7 +61,7 @@ export function LivePage() {
   const nowUnix = orders.data?.nowUnix || metrics.data?.nowUnix || Date.now();
 
   return (
-    <div className="dashboard-stack">
+    <div className="dashboard-stack page-surface">
       <section className="hero card">
         <div>
           <span className="eyebrow">Live Operations</span>
@@ -95,17 +95,17 @@ export function LivePage() {
             </div>
           </div>
           <div className="live-notes">
-            <div className="live-note">
+            <div className="live-note special-note">
               <Clock3 size={16} strokeWidth={2} />
               <strong>{Number(summary.avgDuration || 0).toFixed(2)} min</strong>
               <span>Average duration in the active window</span>
             </div>
-            <div className="live-note">
+            <div className="live-note special-note">
               <Activity size={16} strokeWidth={2} />
               <strong>{formatNumber(items.length)}</strong>
               <span>Visible live orders in the current page slice</span>
             </div>
-            <div className="live-note">
+            <div className="live-note special-note">
               <Bell size={16} strokeWidth={2} />
               <strong>{city || 'All cities'}</strong>
               <span>Current city filter</span>

@@ -88,7 +88,9 @@ function renderCell(column, value) {
 
   if (normalizedLabel.includes('tier')) return renderTierBadge(stringValue);
   if (normalizedLabel.includes('category')) return renderCategoryBadge(stringValue);
+  if (normalizedLabel.includes('status')) return renderCategoryBadge(stringValue);
   if (['severity', 'risk', 'disruption', 'aqi'].some((token) => normalizedLabel.includes(token))) return renderMetricChip(label, stringValue);
+  if (normalizedLabel.includes('type')) return renderCategoryBadge(stringValue);
 
   if (['city', 'state', 'platform', 'driver', 'gig', 'type', 'weather', 'alert'].some((token) => normalizedLabel.includes(token))) {
     return (
@@ -122,7 +124,7 @@ export function PanelTable({ title, caption, columns, rows, rowKey }) {
         <span className="panel-meta">{rows.length} rows</span>
       </div>
       <div className="table-wrap">
-        <table>
+        <table className="panel-table">
           <thead>
             <tr>
               {columns.map((column) => <th key={column.key}>{column.label}</th>)}

@@ -46,8 +46,10 @@ export function StatCard({ title, value, subtitle, tone = 'default' }) {
       <div className={`stat-icon-badge badge-${badge}`}>
         <Icon size={20} strokeWidth={2} />
       </div>
-      <span className="stat-title">{title}</span>
-      <strong className="stat-value">{value}</strong>
+      <div className="stat-copy">
+        <span className="stat-title">{title}</span>
+        <strong className="stat-value">{value}</strong>
+      </div>
       {subtitle ? <span className="stat-subtitle">{subtitle}</span> : null}
     </article>
   );
