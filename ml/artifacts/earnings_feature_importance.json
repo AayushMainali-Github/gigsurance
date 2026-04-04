@@ -2,103 +2,103 @@
   "top_features": [
     {
       "feature": "archetype_full_time",
-      "weight": 0.8582504391670227
+      "weight": 0.854277491569519
     },
     {
       "feature": "hist_income_mean_12",
-      "weight": 0.07488454878330231
+      "weight": 0.07694364339113235
     },
     {
       "feature": "hist_income_mean_4",
-      "weight": 0.015500501729547977
+      "weight": 0.01621244102716446
     },
     {
       "feature": "weather_sensitivity_high",
-      "weight": 0.0034153922460973263
+      "weight": 0.0035492300521582365
     },
     {
       "feature": "forecast_disruption_mean",
-      "weight": 0.002075831638649106
-    },
-    {
-      "feature": "hist_avg_gig_income_8",
-      "weight": 0.001893542823381722
+      "weight": 0.002097603166475892
     },
     {
       "feature": "platform_name_porter",
-      "weight": 0.0017971874913200736
-    },
-    {
-      "feature": "weather_sensitivity_low",
-      "weight": 0.001513220020569861
-    },
-    {
-      "feature": "hist_gigs_mean_4",
-      "weight": 0.0015024140011519194
-    },
-    {
-      "feature": "attendance_discipline",
-      "weight": 0.0014822090743109584
+      "weight": 0.001722516375593841
     },
     {
       "feature": "archetype_part_time",
-      "weight": 0.0014471686445176601
+      "weight": 0.0017140274867415428
     },
     {
-      "feature": "forecast_peak_heat_risk",
-      "weight": 0.0012497866991907358
+      "feature": "weather_sensitivity_low",
+      "weight": 0.0017044439446181059
     },
     {
-      "feature": "forecast_peak_aqi",
-      "weight": 0.0011950858170166612
+      "feature": "hist_avg_gig_income_8",
+      "weight": 0.001636797795072198
+    },
+    {
+      "feature": "hist_gigs_mean_4",
+      "weight": 0.0016269268235191703
+    },
+    {
+      "feature": "attendance_discipline",
+      "weight": 0.0013935902388766408
     },
     {
       "feature": "forecast_disruption_max",
-      "weight": 0.0010220997501164675
+      "weight": 0.0013427494559437037
     },
     {
-      "feature": "hist_income_mean_52",
-      "weight": 0.0009221760556101799
+      "feature": "forecast_peak_heat_risk",
+      "weight": 0.0012943504843860865
     },
     {
-      "feature": "state_Uttar Pradesh",
-      "weight": 0.00082381785614416
-    },
-    {
-      "feature": "forecast_total_rain_mm",
-      "weight": 0.0007708931807428598
-    },
-    {
-      "feature": "forecast_trigger_probability",
-      "weight": 0.0007463970687240362
-    },
-    {
-      "feature": "city_tier_tier1",
-      "weight": 0.0007457777392119169
-    },
-    {
-      "feature": "forecast_weather_stress_index",
-      "weight": 0.0006918487488292158
+      "feature": "forecast_peak_aqi",
+      "weight": 0.0012865160824730992
     },
     {
       "feature": "weather_sensitivity_medium",
-      "weight": 0.0006887883646413684
+      "weight": 0.0008676832658238709
     },
     {
-      "feature": "archetype_weekend_only",
-      "weight": 0.0006488208309747279
+      "feature": "hist_income_mean_52",
+      "weight": 0.0007819888414815068
     },
     {
-      "feature": "state_Telangana",
-      "weight": 0.0005924954311922193
+      "feature": "state_Uttar Pradesh",
+      "weight": 0.0007557591889053583
+    },
+    {
+      "feature": "forecast_trigger_probability",
+      "weight": 0.0007469892152585089
+    },
+    {
+      "feature": "city_tier_tier1",
+      "weight": 0.0007462228531949222
+    },
+    {
+      "feature": "forecast_total_rain_mm",
+      "weight": 0.0007365963538177311
+    },
+    {
+      "feature": "forecast_weather_stress_index",
+      "weight": 0.0007112895837053657
+    },
+    {
+      "feature": "state_Delhi",
+      "weight": 0.0006653190939687192
     },
     {
       "feature": "hist_trigger_days_mean_12",
-      "weight": 0.0005754318553954363
+      "weight": 0.0006180693162605166
     },
     {
-      "feature": "city_Visakhapatnam",
-      "weight": 0.0005557293188758194
+      "feature": "archetype_weekend_only",
+      "weight": 0.0006157639436423779
+    },
+    {
+      "feature": "city_Delhi",
+      "weight": 0.0005545009043999016
     }
   ]
 }

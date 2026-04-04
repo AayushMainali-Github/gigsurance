@@ -2,103 +2,103 @@
   "top_features": [
     {
       "feature": "max_rain_mm_rollmean_7",
-      "weight": 0.1374911218881607
+      "weight": 0.12868575751781464
     },
     {
       "feature": "max_rain_mm_rollmean_3",
-      "weight": 0.024663377553224564
-    },
-    {
-      "feature": "state_West Bengal",
-      "weight": 0.016925936564803123
-    },
-    {
-      "feature": "state_Tamil Nadu",
-      "weight": 0.016651619225740433
+      "weight": 0.023053547367453575
     },
     {
       "feature": "state_Rajasthan",
-      "weight": 0.015201972797513008
-    },
-    {
-      "feature": "month",
-      "weight": 0.014915598556399345
+      "weight": 0.01633300818502903
     },
     {
       "feature": "max_rain_mm_lag_2",
-      "weight": 0.014471335336565971
+      "weight": 0.015832191333174706
+    },
+    {
+      "feature": "state_Tamil Nadu",
+      "weight": 0.015644611790776253
     },
     {
       "feature": "state_Punjab",
-      "weight": 0.013148510828614235
+      "weight": 0.014693843200802803
     },
     {
-      "feature": "state_Odisha",
-      "weight": 0.01298552006483078
+      "feature": "state_West Bengal",
+      "weight": 0.014112959615886211
     },
     {
       "feature": "dayofyear",
-      "weight": 0.012925053015351295
-    },
-    {
-      "feature": "city_Patiala",
-      "weight": 0.009801446460187435
-    },
-    {
-      "feature": "max_rain_mm_lag_14",
-      "weight": 0.00969857256859541
-    },
-    {
-      "feature": "state_Uttar Pradesh",
-      "weight": 0.009512255899608135
-    },
-    {
-      "feature": "weekofyear",
-      "weight": 0.009340685792267323
+      "weight": 0.01366765983402729
     },
     {
       "feature": "city_Rourkela",
-      "weight": 0.009092438034713268
+      "weight": 0.012681272812187672
     },
     {
-      "feature": "state_Jharkhand",
-      "weight": 0.008928787894546986
+      "feature": "city_Patiala",
+      "weight": 0.011120106093585491
     },
     {
-      "feature": "city_Mangalore",
-      "weight": 0.008798560127615929
+      "feature": "state_Odisha",
+      "weight": 0.010976817458868027
+    },
+    {
+      "feature": "state_Uttar Pradesh",
+      "weight": 0.010460847057402134
+    },
+    {
+      "feature": "city_Rajahmundry",
+      "weight": 0.009804023429751396
+    },
+    {
+      "feature": "weekofyear",
+      "weight": 0.00963172223418951
+    },
+    {
+      "feature": "city_Ahmedabad",
+      "weight": 0.009243584237992764
+    },
+    {
+      "feature": "month",
+      "weight": 0.009095242246985435
+    },
+    {
+      "feature": "city_Bhilai",
+      "weight": 0.008886878378689289
+    },
+    {
+      "feature": "max_rain_mm_lag_14",
+      "weight": 0.008518862538039684
     },
     {
       "feature": "city_Gulbarga",
-      "weight": 0.008753592148423195
-    },
-    {
-      "feature": "city_Kolhapur",
-      "weight": 0.00862956140190363
-    },
-    {
-      "feature": "city_Jodhpur",
-      "weight": 0.008618585765361786
-    },
-    {
-      "feature": "max_rain_mm_lag_1",
-      "weight": 0.008568868041038513
-    },
-    {
-      "feature": "city_Amritsar",
-      "weight": 0.008490028791129589
-    },
-    {
-      "feature": "city_Rajkot",
-      "weight": 0.008254539221525192
+      "weight": 0.008495798334479332
     },
     {
       "feature": "city_Pune",
-      "weight": 0.00817386619746685
+      "weight": 0.008393076248466969
     },
     {
-      "feature": "city_Thane",
-      "weight": 0.008137930184602737
+      "feature": "city_Gaya",
+      "weight": 0.008342336863279343
+    },
+    {
+      "feature": "state_Gujarat",
+      "weight": 0.008333515375852585
+    },
+    {
+      "feature": "max_rain_mm_lag_1",
+      "weight": 0.008331985212862492
+    },
+    {
+      "feature": "city_Erode",
+      "weight": 0.008283382281661034
+    },
+    {
+      "feature": "max_rain_mm_lag_7",
+      "weight": 0.008267894387245178
     }
   ]
 }

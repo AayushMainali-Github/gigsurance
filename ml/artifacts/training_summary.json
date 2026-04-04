@@ -1,8 +1,8 @@
 {
   "mongo_uri": "mongodb://localhost:27017",
   "db_name": "gigsurance",
-  "artifact_dir": "D:\\gigsurance\\ml\\artifacts",
-  "weekly_rows": 498591,
+  "artifact_dir": "C:\\Users\\ACER\\OneDrive\\Desktop\\coding\\maintained\\gigsurance\\ml\\artifacts",
+  "weekly_rows": 495852,
   "city_day_rows": 36600,
   "environment_forecast": {
     "model_family": "xgboost_regressor",
@@ -10,40 +10,40 @@
     "rows_test": 7300,
     "targets": {
       "next_disruption_score": {
-        "mae": 0.03549556828112564,
-        "median_ae": 0.02846315475702285,
-        "rmse": 0.04574832478978974,
-        "mean_prediction": 0.21254931390285492
+        "mae": 0.03690430520902486,
+        "median_ae": 0.03024007208347322,
+        "rmse": 0.04745569666684589,
+        "mean_prediction": 0.21318954229354858
       },
       "next_max_aqi": {
-        "mae": 40.45947431590459,
-        "median_ae": 25.067909240722656,
-        "rmse": 62.48526628382126,
-        "mean_prediction": 152.69839477539062
+        "mae": 40.90705517494515,
+        "median_ae": 25.126461029052734,
+        "rmse": 62.647028051651525,
+        "mean_prediction": 152.85067749023438
       },
       "next_max_rain_mm": {
-        "mae": 2.7507473121277273,
-        "median_ae": 2.264384651184082,
-        "rmse": 3.465650956979368,
-        "mean_prediction": 6.313297748565674
+        "mae": 2.7500785714926783,
+        "median_ae": 2.289731574058533,
+        "rmse": 3.4465482802144503,
+        "mean_prediction": 6.270577907562256
       },
       "next_max_heat_risk": {
-        "mae": 0.07591945456023728,
-        "median_ae": 0.055281282067298904,
-        "rmse": 0.10845258466922679,
-        "mean_prediction": 0.2237074226140976
+        "mae": 0.07803954778333147,
+        "median_ae": 0.057388894379138945,
+        "rmse": 0.11090727036537026,
+        "mean_prediction": 0.23983003199100494
       }
     }
   },
   "earnings_forecast": {
     "model_family": "xgboost_regressor",
-    "rows_train": 366665,
-    "rows_test": 91928,
+    "rows_train": 364019,
+    "rows_test": 91836,
     "metrics": {
-      "mae": 254.70044026799155,
-      "median_ae": 173.06609619140636,
-      "rmse": 353.68215349628065,
-      "mean_prediction": 1077.4754638671875
+      "mae": 242.61731276074792,
+      "median_ae": 167.95411437988278,
+      "rmse": 334.5144171990638,
+      "mean_prediction": 1076.978759765625
     }
   },
   "premium_engine": {
