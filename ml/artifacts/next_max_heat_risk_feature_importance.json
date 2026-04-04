@@ -1,0 +1,104 @@
+{
+  "top_features": [
+    {
+      "feature": "max_heat_risk_rollmean_3",
+      "weight": 0.6799403429031372
+    },
+    {
+      "feature": "max_heat_risk_rollmean_7",
+      "weight": 0.06878816336393356
+    },
+    {
+      "feature": "weekofyear",
+      "weight": 0.0460619255900383
+    },
+    {
+      "feature": "month",
+      "weight": 0.026241108775138855
+    },
+    {
+      "feature": "max_heat_risk_lag_1",
+      "weight": 0.020756667479872704
+    },
+    {
+      "feature": "dayofyear",
+      "weight": 0.016142619773745537
+    },
+    {
+      "feature": "state_Rajasthan",
+      "weight": 0.0023277522996068
+    },
+    {
+      "feature": "state_Kerala",
+      "weight": 0.0023075167555361986
+    },
+    {
+      "feature": "state_Jammu and Kashmir",
+      "weight": 0.002081956248730421
+    },
+    {
+      "feature": "max_rain_mm_rollmean_7",
+      "weight": 0.002008107490837574
+    },
+    {
+      "feature": "state_Uttar Pradesh",
+      "weight": 0.001932111568748951
+    },
+    {
+      "feature": "max_aqi_rollmean_7",
+      "weight": 0.0019225628348067403
+    },
+    {
+      "feature": "state_Tamil Nadu",
+      "weight": 0.001891168300062418
+    },
+    {
+      "feature": "city_Bengaluru",
+      "weight": 0.0017756944289430976
+    },
+    {
+      "feature": "city_Srinagar",
+      "weight": 0.001753845950588584
+    },
+    {
+      "feature": "city_Jammu",
+      "weight": 0.0016261294949799776
+    },
+    {
+      "feature": "city_Mysuru",
+      "weight": 0.001523527898825705
+    },
+    {
+      "feature": "max_rain_mm_rollmean_3",
+      "weight": 0.0015180583577603102
+    },
+    {
+      "feature": "state_West Bengal",
+      "weight": 0.001518005970865488
+    },
+    {
+      "feature": "city_Kozhikode",
+      "weight": 0.0014053154736757278
+    },
+    {
+      "feature": "city_Nagpur",
+      "weight": 0.001382385496981442
+    },
+    {
+      "feature": "max_aqi_lag_3",
+      "weight": 0.001349273486994207
+    },
+    {
+      "feature": "max_heat_risk_lag_2",
+      "weight": 0.001344702672213316
+    },
+    {
+      "feature": "city_Jamnagar",
+      "weight": 0.00131819152738899
+    },
+    {
+      "feature": "city_Ujjain",
+      "weight": 0.0012998253805562854
+    }
+  ]
+}
