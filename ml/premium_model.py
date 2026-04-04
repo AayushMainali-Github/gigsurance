@@ -23,8 +23,9 @@ class PremiumEngine:
         self.earnings = EarningsForecaster(self.artifact_dir)
         self.parameters = {
             "minimum_premium_inr": 18.0,
-            "max_premium_share_of_income": 0.22,
-            "base_margin": 1.18,
+            "target_base_share_of_income": 0.0075,
+            "target_expected_loss_share": 0.085,
+            "target_max_share_of_income": 0.075,
         }
 
     @staticmethod
@@ -516,44 +517,54 @@ class PremiumEngine:
         avg_gig_income = max(1.0, float(meta["avg_gig_income_trailing_8w"]))
         fragility = meta["fragility_profile"]
         disruption_probability = float(fragility["forecast_event_pressure"])
-
         base_rate = max(
             self.parameters["minimum_premium_inr"],
-            baseline_income * (0.032 + 0.020 * fragility["forecast_event_pressure"]),
+            baseline_income
+            * (
+                self.parameters["target_base_share_of_income"]
+                + 0.003 * fragility["forecast_event_pressure"]
+                + 0.0015 * fragility["aria_total"]
+            ),
         )
-        feps_multiplier = 1.0 + 0.40 * fragility["forecast_event_pressure"]
-        shortfall_multiplier = 1.0 + 1.10 * shortfall_share
-        regime_shift_multiplier = 1.0 + 0.18 * fragility["earnings_regime_shift_loading"]
-        resilience_trajectory_multiplier = max(
-            0.92,
-            1.0 + 0.12 * fragility["resilience_decline_loading"] - 0.06 * fragility["resilience_improvement_credit"],
+        expected_loss_component = expected_shortfall * (
+            self.parameters["target_expected_loss_share"]
+            + 0.035 * fragility["forecast_event_pressure"]
+            + 0.015 * fragility["aria_environmental"]
         )
-        pcr_loading = 1.0 + 0.10 * fragility["platform_dependency_loading"]
-        sar_loading = 1.0 + 0.08 * fragility["shift_architecture_risk"]
-        weather_resilience_dividend_inr = min(
-            40.0,
-            8.0 + 28.0 * fragility["weather_resilience_dividend"],
+        structural_loading_inr = base_rate * (
+            0.12 * fragility["aria_structural"]
+            + 0.05 * fragility["aria_environmental"]
+            + 0.03 * fragility["earnings_regime_shift_loading"]
+            + 0.03 * fragility["resilience_decline_loading"]
+            + 0.02 * fragility["shift_architecture_risk"]
+            + 0.015 * fragility["platform_dependency_loading"]
+            + 0.015 * fragility["aqi_sensitivity_loading"]
+            + 0.02 * fragility["severe_rain_loading"]
         )
-
-        premium_inr = (
-            base_rate
-            * (1.0 + fragility["aria_structural"])
-            * (1.0 + 0.5 * fragility["aria_environmental"])
-            * feps_multiplier
-            * shortfall_multiplier
-            * regime_shift_multiplier
-            * resilience_trajectory_multiplier
-            * pcr_loading
-            * sar_loading
-        ) - weather_resilience_dividend_inr
+        stability_credit_inr = min(
+            base_rate * 0.55,
+            baseline_income
+            * (
+                0.008 * fragility["weather_resilience_dividend"]
+                + 0.004 * fragility["resilience_improvement_credit"]
+                + 0.008 * (min(no_claim_weeks, 8) / 8.0)
+            ),
+        )
+        affordability_share = min(
+            self.parameters["target_max_share_of_income"],
+            0.038
+            + 0.015 * fragility["forecast_event_pressure"]
+            + 0.01 * fragility["aria_total"],
+        )
         severe_rain_floor_inr = base_rate * (
-            1.0
-            + 0.34 * fragility["severe_rain_loading"]
-            + 0.12 * fragility["aria_environmental"]
-        ) - (weather_resilience_dividend_inr * 0.35)
+            0.88
+            + 0.08 * fragility["severe_rain_loading"]
+            + 0.03 * fragility["aria_environmental"]
+        )
+        premium_inr = base_rate + expected_loss_component + structural_loading_inr - stability_credit_inr
         premium_inr = max(premium_inr, severe_rain_floor_inr)
         premium_inr = max(self.parameters["minimum_premium_inr"], premium_inr)
-        premium_inr = min(premium_inr, predicted_income * self.parameters["max_premium_share_of_income"])
+        premium_inr = min(premium_inr, predicted_income * affordability_share)
 
         coverage_cap_inr = baseline_income * (
             0.78
@@ -564,15 +575,15 @@ class PremiumEngine:
         coverage_cap_inr = max(350.0, min(coverage_cap_inr, baseline_income * 1.90))
 
         severity_index = (
-            0.40 * fragility["forecast_event_pressure"]
-            + 0.26 * weather_stress
-            + 0.18 * fragility["aria_environmental"]
-            + 0.10 * fragility["aria_structural"]
+            0.34 * fragility["forecast_event_pressure"]
+            + 0.24 * weather_stress
+            + 0.16 * fragility["aria_environmental"]
+            + 0.16 * fragility["aria_structural"]
             + 0.06 * fragility["aqi_sensitivity_loading"]
         )
-        if severity_index >= 0.72:
+        if severity_index >= 0.76:
             risk_label = "High"
-        elif severity_index >= 0.38:
+        elif severity_index >= 0.46:
             risk_label = "Moderate"
         else:
             risk_label = "Low"
@@ -589,24 +600,27 @@ class PremiumEngine:
                 "baseline": {
                     "base_rate_inr": round(base_rate, 2),
                     "counterfactual_baseline_income_inr": round(counterfactual_baseline_income, 2),
+                    "expected_loss_component_inr": round(expected_loss_component, 2),
                 },
                 "risk_loadings": {
-                    "aria_structural_loading": round(1.0 + fragility["aria_structural"], 4),
-                    "aria_environmental_loading": round(1.0 + 0.5 * fragility["aria_environmental"], 4),
-                    "forecast_event_loading": round(feps_multiplier, 4),
-                    "shortfall_loading": round(shortfall_multiplier, 4),
-                    "earnings_regime_shift_loading": round(regime_shift_multiplier, 4),
-                    "resilience_trajectory_loading": round(resilience_trajectory_multiplier, 4),
-                    "platform_dependency_loading": round(pcr_loading, 4),
-                    "shift_architecture_loading": round(sar_loading, 4),
+                    "structural_loading_inr": round(structural_loading_inr, 2),
+                    "aria_structural_score": round(fragility["aria_structural"], 4),
+                    "aria_environmental_score": round(fragility["aria_environmental"], 4),
+                    "forecast_event_pressure": round(fragility["forecast_event_pressure"], 4),
+                    "shortfall_share": round(shortfall_share, 4),
+                    "earnings_regime_shift_loading": round(fragility["earnings_regime_shift_loading"], 4),
+                    "resilience_decline_loading": round(fragility["resilience_decline_loading"], 4),
+                    "platform_dependency_loading": round(fragility["platform_dependency_loading"], 4),
+                    "shift_architecture_risk": round(fragility["shift_architecture_risk"], 4),
                 },
                 "credits": {
-                    "weather_resilience_dividend_inr": round(weather_resilience_dividend_inr, 2),
+                    "stability_credit_inr": round(stability_credit_inr, 2),
+                    "weather_resilience_dividend_score": round(fragility["weather_resilience_dividend"], 4),
                     "resilience_trajectory_label": fragility["resilience_trajectory_label"],
                 },
                 "guardrails": {
                     "minimum_premium_inr": round(self.parameters["minimum_premium_inr"], 2),
-                    "premium_share_cap_of_income": round(self.parameters["max_premium_share_of_income"], 4),
+                    "premium_share_cap_of_income": round(affordability_share, 4),
                     "severe_rain_floor_inr": round(severe_rain_floor_inr, 2),
                 },
                 "confidence": {
@@ -650,7 +664,7 @@ class PremiumEngine:
             "shift_architecture_risk": float(fragility["shift_architecture_risk"]),
             "platform_dependency_loading": float(fragility["platform_dependency_loading"]),
             "weather_resilience_dividend": float(fragility["weather_resilience_dividend"]),
-            "weather_resilience_dividend_inr": round(weather_resilience_dividend_inr, 2),
+            "stability_credit_inr": round(stability_credit_inr, 2),
             "city_rebound_velocity": float(fragility["city_rebound_velocity"]),
             "city_rebound_lag_weeks": float(fragility["city_rebound_lag_weeks"]),
             "seasonal_risk_phase": fragility["seasonal_risk_phase"],

@@ -4,3 +4,4 @@ dist
 coverage
 ml/cache/
 ml/__pycache__/
+*.log

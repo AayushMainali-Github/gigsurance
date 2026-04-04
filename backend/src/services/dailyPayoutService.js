@@ -11,6 +11,46 @@ const { writeLedgerEntries, snapshotGlobalBalance } = require("./ledgerService")
 const { createPayoutReviewCase } = require("./riskReviewService");
 const { buildPayoutExplanation } = require("./explanationFormatter");
 
+function buildCompactPayoutReceipt({ batchArchive, payout, incident, worker }) {
+  return {
+    version: payout.version,
+    endpoint: batchArchive?.endpoint || "/payout/batch",
+    requestedAt: batchArchive?.requestedAt || new Date().toISOString(),
+    workerId: payout.workerId,
+    platformName: payout.platformName,
+    city: worker?.city || null,
+    state: worker?.state || null,
+    incidentContext: {
+      date: incident?.date || null,
+      city: incident?.city || null,
+      state: incident?.state || null,
+      disruptionScore: incident?.disruptionScore || null,
+      verified: incident?.verified || false
+    },
+    modelRequest: {
+      worker_id: payout.workerId,
+      platform_name: payout.platformName
+    },
+    normalizedDecision: {
+      recommendedPayoutInr: payout.recommendedPayoutInr,
+      payoutEligible: payout.payoutEligible,
+      decisionConfidenceScore: payout.decisionConfidenceScore,
+      decisionConfidenceBand: payout.decisionConfidenceBand,
+      recommendedTrustAction: payout.recommendedTrustAction,
+      triggerCertaintyScore: payout.triggerCertaintyScore,
+      triggerStrengthScore: payout.triggerStrengthScore,
+      claimConfidence: payout.claimConfidence,
+      locationAlignmentScore: payout.locationAlignmentScore,
+      locationAlignmentScore100: payout.locationAlignmentScore100,
+      cohortSupportScore: payout.cohortSupportScore,
+      counterfactualCoherenceScore: payout.counterfactualCoherenceScore,
+      historicalDataDepthScore: payout.historicalDataDepthScore,
+      environmentForecastAgreementScore: payout.environmentForecastAgreementScore,
+      payoutReceipt: payout.payoutReceipt
+    }
+  };
+}
+
 async function processDailyPayoutRun({ scheduledFor = new Date(), onProgress } = {}) {
   const incidentDate = previousDay(scheduledFor);
   const incidents = await detectIncidentsForDate(incidentDate);
@@ -89,7 +129,14 @@ async function processDailyPayoutRun({ scheduledFor = new Date(), onProgress } =
             riskReviewFlag: true,
             manualReviewFlag: true,
             recommendedTrustAction: "manual_review",
-            mlReceipt: batchResult.archive,
+            mlReceipt: {
+              version: batchResult.normalized.version,
+              endpoint: batchResult.archive?.endpoint || "/payout/batch",
+              requestedAt: batchResult.archive?.requestedAt || new Date().toISOString(),
+              workerId: worker.platformDriverId,
+              platformName: worker.platformName,
+              error: "payout_unavailable"
+            },
             mlVersion: batchResult.normalized.version,
             status: "failed"
           }
@@ -141,13 +188,7 @@ async function processDailyPayoutRun({ scheduledFor = new Date(), onProgress } =
           riskReviewFlag: penalty.riskReviewFlag,
           manualReviewFlag: penalty.manualReviewFlag,
           recommendedTrustAction: payout.recommendedTrustAction,
-          mlReceipt: {
-            modelRequest: batchResult.archive.requestPayload,
-            modelResponse: batchResult.archive.rawResponse,
-            normalizedDecision: payout,
-            archive: batchResult.archive,
-            incidentContext: incident
-          },
+          mlReceipt: buildCompactPayoutReceipt({ batchArchive: batchResult.archive, payout, incident, worker }),
           finalDecisionSnapshot: explanation.backendDecision,
           penaltyExplanation: explanation.penaltyExplanation,
           mlVersion: payout.version,

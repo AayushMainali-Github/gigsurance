@@ -9,6 +9,34 @@ const { writeLedgerEntries } = require("./ledgerService");
 const { createPremiumReviewCase } = require("./riskReviewService");
 const { buildPremiumExplanation } = require("./explanationFormatter");
 
+function buildCompactQuoteReceipt({ batchArchive, quote, weekStart, weekEnd, worker }) {
+  return {
+    version: quote.version,
+    endpoint: batchArchive?.endpoint || "/quote/batch",
+    requestedAt: batchArchive?.requestedAt || new Date().toISOString(),
+    workerId: quote.workerId,
+    platformName: quote.platformName,
+    city: worker?.city || null,
+    state: worker?.state || null,
+    weekStart,
+    weekEnd,
+    modelRequest: {
+      worker_id: quote.workerId,
+      platform_name: quote.platformName
+    },
+    normalizedDecision: {
+      premiumAmountInr: quote.premiumAmountInr,
+      premiumDeliveries: quote.premiumDeliveries,
+      quoteConfidenceScore: quote.quoteConfidenceScore,
+      quoteConfidenceBand: quote.quoteConfidenceBand,
+      predictedNextWeekIncomeInr: quote.predictedNextWeekIncomeInr,
+      forecastDetails: quote.forecastDetails,
+      fragilityFeatures: quote.fragilityFeatures,
+      pricingReceipt: quote.pricingReceipt
+    }
+  };
+}
+
 function weekBounds(scheduledFor = new Date()) {
   const base = new Date(scheduledFor);
   const day = base.getUTCDay();
@@ -89,7 +117,14 @@ async function processWeeklyPremiumRun({ scheduledFor = new Date(), onProgress }
             confidenceBand: null,
             riskReviewFlag: true,
             manualReviewFlag: true,
-            mlReceipt: batchResult.archive,
+            mlReceipt: {
+              version: batchResult.normalized.version,
+              endpoint: batchResult.archive?.endpoint || "/quote/batch",
+              requestedAt: batchResult.archive?.requestedAt || new Date().toISOString(),
+              workerId: worker.platformDriverId,
+              platformName: worker.platformName,
+              error: "quote_unavailable"
+            },
             mlVersion: batchResult.normalized.version,
             status: "failed"
           }
@@ -130,12 +165,7 @@ async function processWeeklyPremiumRun({ scheduledFor = new Date(), onProgress }
           confidenceBand: quote.quoteConfidenceBand,
           riskReviewFlag: penalty.riskReviewFlag,
           manualReviewFlag: penalty.manualReviewFlag,
-          mlReceipt: {
-            modelRequest: batchResult.archive.requestPayload,
-            modelResponse: batchResult.archive.rawResponse,
-            normalizedDecision: quote,
-            archive: batchResult.archive
-          },
+          mlReceipt: buildCompactQuoteReceipt({ batchArchive: batchResult.archive, quote, weekStart, weekEnd, worker }),
           finalDecisionSnapshot: explanation.backendDecision,
           penaltyExplanation: explanation.penaltyExplanation,
           mlVersion: quote.version,
@@ -249,4 +279,13 @@ async function processWeeklyPremiumRun({ scheduledFor = new Date(), onProgress }
   };
 }
 
-module.exports = { processWeeklyPremiumRun, weekBounds };
+async function ensureCurrentWeekPremiumForPolicy(policyId, scheduledFor = new Date()) {
+  const { weekStart } = weekBounds(scheduledFor);
+  const existing = await WeeklyPremiumDecision.findOne({ policyId, weekStart }).lean();
+  if (existing) return existing;
+
+  await processWeeklyPremiumRun({ scheduledFor });
+  return WeeklyPremiumDecision.findOne({ policyId, weekStart }).lean();
+}
+
+module.exports = { processWeeklyPremiumRun, weekBounds, ensureCurrentWeekPremiumForPolicy };

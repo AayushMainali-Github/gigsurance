@@ -4,8 +4,9 @@ const { logger } = require("../config/logger");
 const { ApiError } = require("../utils/ApiError");
 const { normalizeQuoteResponse, normalizePayoutResponse } = require("./mlNormalizers");
 
-const DEFAULT_TIMEOUT_MS = 15000;
+const DEFAULT_TIMEOUT_MS = 120000;
 const DEFAULT_RETRIES = 2;
+const DEFAULT_BATCH_SIZE = 20;
 
 const mlApi = axios.create({
   baseURL: config.mlApiBaseUrl,
@@ -96,18 +97,59 @@ async function quoteWorker(payload) {
 }
 
 async function quoteBatch(payload) {
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  const chunks = [];
+  for (let index = 0; index < items.length; index += DEFAULT_BATCH_SIZE) {
+    chunks.push(items.slice(index, index + DEFAULT_BATCH_SIZE));
+  }
+
+  const allResults = [];
+  const allErrors = [];
+  const rawResponses = [];
+
   try {
-    const response = await withRetry("/quote/batch", () => mlApi.post("/quote/batch", payload));
-    const results = (response.data.results || []).map(normalizeQuoteResponse);
+    for (const chunk of chunks) {
+      try {
+        const response = await withRetry("/quote/batch", () => mlApi.post("/quote/batch", {
+          ...payload,
+          items: chunk
+        }));
+        rawResponses.push(response.data);
+        allResults.push(...(response.data.results || []).map(normalizeQuoteResponse));
+        allErrors.push(...(response.data.errors || []));
+      } catch (chunkError) {
+        logger.warn({ endpoint: "/quote/batch", chunkSize: chunk.length, error: chunkError.message }, "ml batch quote chunk failed, falling back to per-worker quoting");
+        for (const item of chunk) {
+          const single = await quoteWorker({
+            worker_id: item.worker_id,
+            platform_name: item.platform_name,
+            horizon_days: item.horizon_days ?? payload.horizon_days,
+            no_claim_weeks: item.no_claim_weeks ?? payload.no_claim_weeks,
+            forecast_overrides: item.forecast_overrides ?? payload.forecast_overrides ?? {}
+          });
+          if (single.ok && !single.normalized.unavailable) {
+            allResults.push(single.normalized);
+            rawResponses.push(single.archive.rawResponse);
+          } else {
+            allErrors.push({
+              worker_id: item.worker_id,
+              platform_name: item.platform_name,
+              error: single.error?.message || "quote_unavailable"
+            });
+          }
+        }
+      }
+    }
+
     return {
       ok: true,
       normalized: {
         version: "ml.quote.batch.v1",
-        requestedCount: response.data.requested_count || payload.items?.length || 0,
-        quotedCount: response.data.quoted_count || results.length,
-        errorCount: response.data.error_count || 0,
-        results,
-        errors: response.data.errors || []
+        requestedCount: items.length,
+        quotedCount: allResults.length,
+        errorCount: allErrors.length,
+        results: allResults,
+        errors: allErrors
       },
       archive: {
         version: "ml.quote.batch.v1",
@@ -115,8 +157,8 @@ async function quoteBatch(payload) {
         requestedAt: new Date().toISOString(),
         requestPayload: payload,
         fallbackUsed: false,
-        rawResponse: response.data,
-        normalizedResults: results
+        rawResponse: rawResponses,
+        normalizedResults: allResults
       }
     };
   } catch (error) {
@@ -126,11 +168,11 @@ async function quoteBatch(payload) {
       normalized: {
         version: "ml.quote.batch.v1",
         unavailable: true,
-        requestedCount: payload.items?.length || 0,
-        quotedCount: 0,
-        errorCount: payload.items?.length || 0,
-        results: [],
-        errors: [{ error: "quote_batch_unavailable" }]
+        requestedCount: items.length,
+        quotedCount: allResults.length,
+        errorCount: Math.max(1, items.length - allResults.length),
+        results: allResults,
+        errors: allErrors.length ? allErrors : [{ error: "quote_batch_unavailable" }]
       },
       archive: {
         version: "ml.quote.batch.v1",
@@ -138,8 +180,8 @@ async function quoteBatch(payload) {
         requestedAt: new Date().toISOString(),
         requestPayload: payload,
         fallbackUsed: true,
-        rawResponse: null,
-        normalizedResults: []
+        rawResponse: rawResponses,
+        normalizedResults: allResults
       },
       error: new ApiError(503, "ML service unavailable for batch quote")
     };
@@ -157,18 +199,65 @@ async function assessPayout(payload) {
 }
 
 async function assessPayoutBatch(payload) {
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  const chunks = [];
+  for (let index = 0; index < items.length; index += DEFAULT_BATCH_SIZE) {
+    chunks.push(items.slice(index, index + DEFAULT_BATCH_SIZE));
+  }
+
+  const allResults = [];
+  const allErrors = [];
+  const rawResponses = [];
+
   try {
-    const response = await withRetry("/payout/batch", () => mlApi.post("/payout/batch", payload));
-    const results = (response.data.results || []).map(normalizePayoutResponse);
+    for (const chunk of chunks) {
+      try {
+        const response = await withRetry("/payout/batch", () => mlApi.post("/payout/batch", {
+          ...payload,
+          items: chunk
+        }));
+        rawResponses.push(response.data);
+        allResults.push(...(response.data.results || []).map(normalizePayoutResponse));
+        allErrors.push(...(response.data.errors || []));
+      } catch (chunkError) {
+        logger.warn({ endpoint: "/payout/batch", chunkSize: chunk.length, error: chunkError.message }, "ml batch payout chunk failed, falling back to per-worker payout assessment");
+        for (const item of chunk) {
+          const single = await assessPayout({
+            worker_id: item.worker_id,
+            platform_name: item.platform_name,
+            horizon_days: item.horizon_days ?? payload.horizon_days,
+            affected_days: item.affected_days ?? payload.affected_days,
+            incident_city: item.incident_city ?? payload.incident_city,
+            incident_state: item.incident_state ?? payload.incident_state,
+            days_since_enrollment: item.days_since_enrollment ?? payload.days_since_enrollment,
+            no_claim_weeks: item.no_claim_weeks ?? payload.no_claim_weeks,
+            verified_incident: item.verified_incident ?? payload.verified_incident,
+            loss_ratio_override: item.loss_ratio_override ?? payload.loss_ratio_override,
+            forecast_overrides: item.forecast_overrides ?? payload.forecast_overrides ?? {}
+          });
+          if (single.ok && !single.normalized.unavailable) {
+            allResults.push(single.normalized);
+            rawResponses.push(single.archive.rawResponse);
+          } else {
+            allErrors.push({
+              worker_id: item.worker_id,
+              platform_name: item.platform_name,
+              error: single.error?.message || "payout_unavailable"
+            });
+          }
+        }
+      }
+    }
+
     return {
       ok: true,
       normalized: {
         version: "ml.payout.batch.v1",
-        requestedCount: response.data.requested_count || payload.items?.length || 0,
-        assessedCount: response.data.assessed_count || results.length,
-        errorCount: response.data.error_count || 0,
-        results,
-        errors: response.data.errors || []
+        requestedCount: items.length,
+        assessedCount: allResults.length,
+        errorCount: allErrors.length,
+        results: allResults,
+        errors: allErrors
       },
       archive: {
         version: "ml.payout.batch.v1",
@@ -176,8 +265,8 @@ async function assessPayoutBatch(payload) {
         requestedAt: new Date().toISOString(),
         requestPayload: payload,
         fallbackUsed: false,
-        rawResponse: response.data,
-        normalizedResults: results
+        rawResponse: rawResponses,
+        normalizedResults: allResults
       }
     };
   } catch (error) {
@@ -187,11 +276,11 @@ async function assessPayoutBatch(payload) {
       normalized: {
         version: "ml.payout.batch.v1",
         unavailable: true,
-        requestedCount: payload.items?.length || 0,
-        assessedCount: 0,
-        errorCount: payload.items?.length || 0,
-        results: [],
-        errors: [{ error: "payout_batch_unavailable" }]
+        requestedCount: items.length,
+        assessedCount: allResults.length,
+        errorCount: Math.max(1, items.length - allResults.length),
+        results: allResults,
+        errors: allErrors.length ? allErrors : [{ error: "payout_batch_unavailable" }]
       },
       archive: {
         version: "ml.payout.batch.v1",
@@ -199,8 +288,8 @@ async function assessPayoutBatch(payload) {
         requestedAt: new Date().toISOString(),
         requestPayload: payload,
         fallbackUsed: true,
-        rawResponse: null,
-        normalizedResults: []
+        rawResponse: rawResponses,
+        normalizedResults: allResults
       },
       error: new ApiError(503, "ML service unavailable for batch payout")
     };

@@ -17,7 +17,7 @@ const getReviewCaseController = asyncHandler(async (req, res) => {
 const applyReviewActionController = asyncHandler(async (req, res) => {
   const item = await applyReviewAction({
     caseId: req.params.caseId,
-    adminUserId: req.auth.sub,
+    adminUserId: req.auth?.sub || null,
     action: req.body.action,
     notes: req.body.notes
   });

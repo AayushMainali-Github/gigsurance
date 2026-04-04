@@ -291,6 +291,24 @@ List valid workers:
 python -m ml.list_workers --limit 20
 ```
 
+Audit premium distribution across a cohort:
+
+```bash
+python -m ml.pricing_audit --limit 100
+```
+
+Audit how loyalty changes pricing:
+
+```bash
+python -m ml.pricing_audit --limit 100 --no-claim-weeks 6
+```
+
+Audit premium pool versus payout exposure:
+
+```bash
+python -m ml.portfolio_audit --limit 100
+```
+
 ## API
 
 Run the service:

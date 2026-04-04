@@ -16,9 +16,9 @@ class PayoutEngine:
     def __post_init__(self) -> None:
         self.premium = PremiumEngine(self.artifact_dir)
         self.parameters = {
-            "minimum_actionable_shortfall_inr": 12.0,
-            "base_deductible_inr": 18.0,
-            "max_window_coverage_share": 0.65,
+            "minimum_actionable_shortfall_inr": 18.0,
+            "base_deductible_inr": 24.0,
+            "max_window_coverage_share": 0.52,
         }
 
     @staticmethod
@@ -234,7 +234,7 @@ class PayoutEngine:
         peer_sanity_cap_inr = counterfactual_window_income * max(observed_loss_ratio, min(1.0, peer_loss_ratio * 1.15))
         gross_loss_basis_inr = min(worker_loss_basis_inr, max(expected_shortfall_window_inr, peer_sanity_cap_inr))
 
-        deductible_ratio = max(0.06, 0.24 - 0.14 * trigger_strength)
+        deductible_ratio = max(0.10, 0.28 - 0.12 * trigger_strength)
         deductible_inr = max(
             self.parameters["base_deductible_inr"] * affected_share,
             gross_loss_basis_inr * deductible_ratio,
@@ -265,29 +265,33 @@ class PayoutEngine:
             registration_timing_penalty,
         )
 
-        severity_multiplier = 0.72 + 0.48 * trigger_strength + 0.18 * float(quote["aria_environmental"])
+        severity_multiplier = 0.60 + 0.34 * trigger_strength + 0.12 * float(quote["aria_environmental"])
         gross_payable_inr = gross_loss_basis_inr * severity_multiplier * certainty_multiplier
 
         recovery_holdback_ratio = self._clip01(
-            0.18 * (1.0 - trigger_strength)
-            + 0.10 * float(quote["city_rebound_velocity"])
+            0.24 * (1.0 - trigger_strength)
+            + 0.12 * float(quote["city_rebound_velocity"])
             + 0.06 * float(quote["weather_resilience_dividend"])
         )
         gross_after_deductible = max(0.0, gross_payable_inr - deductible_inr)
         holdback_inr = gross_after_deductible * recovery_holdback_ratio
 
-        shortfall_guardrail_inr = expected_shortfall_window_inr * (0.88 + 0.28 * trigger_strength)
+        shortfall_guardrail_inr = expected_shortfall_window_inr * (0.74 + 0.22 * trigger_strength)
         coverage_guardrail_inr = float(quote["coverage_cap_inr"]) * min(
             self.parameters["max_window_coverage_share"],
-            0.18 + 0.90 * affected_share,
+            0.14 + 0.72 * affected_share,
         )
-        income_guardrail_inr = counterfactual_window_income * (0.55 + 0.30 * trigger_strength)
+        income_guardrail_inr = counterfactual_window_income * (0.42 + 0.24 * trigger_strength)
         payout_cap_inr = min(shortfall_guardrail_inr, coverage_guardrail_inr, income_guardrail_inr)
 
         payout_eligible = (
-            trigger_strength >= 0.30
-            and gross_loss_basis_inr >= self.parameters["minimum_actionable_shortfall_inr"]
-        ) or verified_incident
+            gross_loss_basis_inr >= self.parameters["minimum_actionable_shortfall_inr"]
+            and decision_confidence_score >= 55
+            and (
+                trigger_strength >= 0.38
+                or (verified_incident and trigger_strength >= 0.30 and observed_loss_ratio >= 0.12)
+            )
+        )
 
         net_payout_inr = 0.0
         recommended_action = "no_payout"

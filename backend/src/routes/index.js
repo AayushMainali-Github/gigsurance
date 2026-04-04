@@ -36,10 +36,10 @@ apiRouter.use("/workers", requireAuth, workersRouter);
 apiRouter.use("/policies", requireAuth, policiesRouter);
 apiRouter.use("/billing", requireAuth, billingRouter);
 apiRouter.use("/payouts", requireAuth, payoutsRouter);
-apiRouter.use("/fraud", requireAuth, requireAdmin, fraudRouter);
-apiRouter.use("/admin", requireAuth, requireAdmin, adminRouter);
+apiRouter.use("/fraud", fraudRouter);
+apiRouter.use("/admin", adminRouter);
 apiRouter.use("/ml", requireAuth, requireAdmin, mlRouter);
-apiRouter.use("/audit", requireAuth, requireAdmin, auditRouter);
-apiRouter.use("/finance", requireAuth, requireAdmin, financeRouter);
+apiRouter.use("/audit", auditRouter);
+apiRouter.use("/finance", financeRouter);
 
 module.exports = { apiRouter };

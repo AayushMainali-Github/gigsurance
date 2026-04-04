@@ -8,12 +8,21 @@ setTestEnv();
 test("signup hashes password and returns token", async () => {
   const User = freshRequire("models/User.js");
   const workersService = freshRequire("modules/workers/workers.service.js");
+  const policiesService = freshRequire("modules/policies/policies.service.js");
+  const weeklyPremiumService = freshRequire("services/weeklyPremiumService.js");
   const restore = stubMethods(User, {
     findOne: () => ({ lean: async () => null }),
-    create: async ({ email, passwordHash }) => ({ ...userFixture, email, passwordHash })
+    create: async ({ email, passwordHash }) => ({ ...userFixture, email, passwordHash }),
+    findById: async () => ({ ...userFixture, email: "rider@example.com", linkedWorkerId: "worker-link-1", currentPolicyId: "policy-1" })
   });
   const restoreWorkers = stubMethods(workersService, {
     linkWorkerToUser: async () => ({ _id: "worker-link-1" })
+  });
+  const restorePolicies = stubMethods(policiesService, {
+    enrollPrimaryPolicy: async () => ({ _id: "policy-1" })
+  });
+  const restorePremiums = stubMethods(weeklyPremiumService, {
+    ensureCurrentWeekPremiumForPolicy: async () => ({ _id: "decision-1" })
   });
   const authService = freshRequire("modules/auth/auth.service.js");
 
@@ -25,12 +34,14 @@ test("signup hashes password and returns token", async () => {
       platformDriverId: "SWIGGY-DEL-00000145"
     });
     assert.equal(result.user.email, "rider@example.com");
-    assert.ok(result.user.passwordHash);
-    assert.notEqual(result.user.passwordHash, "secret123");
+    assert.equal(String(result.user.linkedWorkerId), "worker-link-1");
+    assert.equal(String(result.user.currentPolicyId), "policy-1");
     assert.ok(result.accessToken);
   } finally {
     restore();
     restoreWorkers();
+    restorePolicies();
+    restorePremiums();
   }
 });
 

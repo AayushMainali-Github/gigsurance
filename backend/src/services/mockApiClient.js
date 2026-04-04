@@ -4,7 +4,7 @@ const { ApiError } = require("../utils/ApiError");
 
 const mockApi = axios.create({
   baseURL: config.mockApiBaseUrl,
-  timeout: 15000
+  timeout: 60000
 });
 
 async function getDriverByPlatformId(platformName, platformDriverId) {
@@ -17,7 +17,16 @@ async function getDriverByPlatformId(platformName, platformDriverId) {
   }
 }
 
-async function paginatedFetch(path, params = {}, pageSize = 1000) {
+async function healthcheckMockApi() {
+  try {
+    const response = await mockApi.get("/health");
+    return response.data;
+  } catch (_error) {
+    throw new ApiError(503, `Mock API unavailable at ${config.mockApiBaseUrl}`);
+  }
+}
+
+async function paginatedFetch(path, params = {}, pageSize = 1000, maxItems = Infinity) {
   const items = [];
   let page = 1;
 
@@ -35,11 +44,15 @@ async function paginatedFetch(path, params = {}, pageSize = 1000) {
       throw new ApiError(503, `Mock API unavailable for ${path}`);
     }
 
-    const data = response.data?.data;
+    const root = response.data || {};
+    const data = root.data;
     const pageItems = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
     items.push(...pageItems);
+    if (items.length >= maxItems) {
+      return items.slice(0, maxItems);
+    }
 
-    const total = Number(data?.pagination?.total || 0);
+    const total = Number(root.total || data?.pagination?.total || 0);
     if (!pageItems.length || (total && items.length >= total) || pageItems.length < pageSize) break;
     page += 1;
   }
@@ -55,8 +68,14 @@ async function listAqiSnapshots(params) {
   return paginatedFetch("/api/aqi/snapshots", params, 1000);
 }
 
+async function listDeliveryDrivers(params = {}, maxItems = Infinity) {
+  return paginatedFetch("/api/delivery/drivers", params, 200, maxItems);
+}
+
 module.exports = {
+  healthcheckMockApi,
   getDriverByPlatformId,
+  listDeliveryDrivers,
   listWeatherSnapshots,
   listAqiSnapshots
 };

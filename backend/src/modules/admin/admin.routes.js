@@ -36,7 +36,7 @@ router.get("/users", asyncHandler(async (req, res) => {
 router.post("/users/:userId/suspend", validate(adminUserActionSchema), asyncHandler(async (req, res) => {
   const data = await suspendUserAccount({
     userId: req.params.userId,
-    adminUserId: req.auth.sub,
+    adminUserId: req.auth?.sub || null,
     reason: req.body.reason
   });
   res.json({ ok: true, data });
@@ -45,7 +45,7 @@ router.post("/users/:userId/suspend", validate(adminUserActionSchema), asyncHand
 router.post("/users/:userId/notes", validate(adminAnnotationSchema), asyncHandler(async (req, res) => {
   const data = await annotateAccount({
     userId: req.params.userId,
-    adminUserId: req.auth.sub,
+    adminUserId: req.auth?.sub || null,
     note: req.body.note
   });
   res.json({ ok: true, data });
@@ -79,7 +79,7 @@ router.get("/exposure", asyncHandler(async (req, res) => {
 router.post("/premiums/:decisionId/override", validate(adminPremiumOverrideSchema), asyncHandler(async (req, res) => {
   const data = await overridePremiumDecision({
     decisionId: req.params.decisionId,
-    adminUserId: req.auth.sub,
+    adminUserId: req.auth?.sub || null,
     finalPremiumInr: req.body.finalPremiumInr,
     reason: req.body.reason
   });
@@ -89,7 +89,7 @@ router.post("/premiums/:decisionId/override", validate(adminPremiumOverrideSchem
 router.post("/payouts/:decisionId/override", validate(adminPayoutOverrideSchema), asyncHandler(async (req, res) => {
   const data = await overridePayoutDecision({
     decisionId: req.params.decisionId,
-    adminUserId: req.auth.sub,
+    adminUserId: req.auth?.sub || null,
     finalPayoutInr: req.body.finalPayoutInr,
     status: req.body.status,
     reason: req.body.reason

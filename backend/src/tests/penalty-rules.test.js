@@ -10,10 +10,11 @@ test("premium penalty stays neutral below confidence threshold", () => {
   assert.equal(result.manualReviewFlag, true);
 });
 
-test("premium penalty increases for high-confidence risky case", () => {
+test("premium confidence handling keeps price neutral and flags only for review", () => {
   const result = derivePremiumPenalty({ confidenceScore: 91, confidenceBand: "low" });
   assert.equal(result.riskReviewFlag, true);
-  assert.ok(result.penaltyMultiplier > 1);
+  assert.equal(result.penaltyMultiplier, 1);
+  assert.equal(result.reason, "confidence_review_only");
 });
 
 test("payout penalty can hold high-risk cases", () => {

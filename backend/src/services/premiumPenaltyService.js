@@ -4,6 +4,7 @@ function roundMoney(value) {
 
 function derivePremiumPenalty({ confidenceScore, confidenceBand }) {
   const score = Number(confidenceScore || 0);
+  const normalizedBand = String(confidenceBand || "").toLowerCase();
 
   if (score < 75) {
     return {
@@ -14,19 +15,11 @@ function derivePremiumPenalty({ confidenceScore, confidenceBand }) {
     };
   }
 
-  let penaltyMultiplier = 1.05;
-  if (score >= 90) penaltyMultiplier = 1.22;
-  else if (score >= 85) penaltyMultiplier = 1.15;
-  else if (score >= 80) penaltyMultiplier = 1.1;
-
-  if (confidenceBand === "low") penaltyMultiplier = Math.max(penaltyMultiplier, 1.2);
-  if (confidenceBand === "medium") penaltyMultiplier = Math.max(penaltyMultiplier, 1.1);
-
   return {
-    riskReviewFlag: score >= 85 || confidenceBand === "low",
-    manualReviewFlag: score >= 92 || confidenceBand === "low",
-    penaltyMultiplier: roundMoney(penaltyMultiplier),
-    reason: "confidence_penalty_applied"
+    riskReviewFlag: normalizedBand === "low" || score >= 90,
+    manualReviewFlag: normalizedBand === "low" || score >= 95,
+    penaltyMultiplier: 1,
+    reason: "confidence_review_only"
   };
 }
 

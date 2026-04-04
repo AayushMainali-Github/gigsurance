@@ -55,6 +55,15 @@ JOB_MAX_RETRIES=2
 - `npm test`
 - `npm run test:unit`
 
+## Local Frontend Access
+
+The backend sends permissive CORS headers for local/dev frontend usage.
+
+That allows browser apps running on local origins such as:
+- `http://localhost:5173`
+- `http://localhost:5175`
+- other local Vite/dev ports
+
 ## Folder Structure
 
 ```text
