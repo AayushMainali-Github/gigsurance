@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
 import { formatNumber } from '../../lib/utils/format';
+import { formatLabel } from '../../lib/utils/format';
 import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
 
@@ -49,7 +50,7 @@ export function CitiesPage() {
             { key: 'pick', label: 'Pick', render: (row) => <button className="mini-button" onClick={() => setSelectedCity(row.city)}>{row.city === activeCity ? 'Active' : 'Open'}</button> },
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'state', label: 'State', render: (row) => row.state },
-            { key: 'tier', label: 'Tier', render: (row) => String(row.cityTier || '').toUpperCase() },
+            { key: 'tier', label: 'Tier', render: (row) => formatLabel(row.cityTier) },
             { key: 'drivers', label: 'Drivers', render: (row) => formatNumber(row.drivers) }
           ]}
         />

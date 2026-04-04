@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
 import { formatNumber } from '../../lib/utils/format';
+import { formatLabel } from '../../lib/utils/format';
 import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
 import { SparkBarList } from '../../components/SparkBarList';
@@ -73,7 +74,7 @@ export function DeliveryPage() {
             { key: 'driver', label: 'Driver', render: (row) => row.platformDriverId },
             { key: 'platform', label: 'Platform', render: (row) => row.platformName },
             { key: 'city', label: 'City', render: (row) => row.city },
-            { key: 'tier', label: 'Tier', render: (row) => String(row.cityTier || '').toUpperCase() },
+            { key: 'tier', label: 'Tier', render: (row) => formatLabel(row.cityTier) },
             { key: 'archetype', label: 'Archetype', render: (row) => row.driverProfile?.archetype },
             { key: 'sensitivity', label: 'Sensitivity', render: (row) => row.driverProfile?.weatherSensitivity }
           ]}

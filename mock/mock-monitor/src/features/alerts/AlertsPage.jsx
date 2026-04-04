@@ -5,6 +5,7 @@ import { AlertTriangle, Bell, Cloud, Truck, Wind } from 'lucide-react';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
 import { formatNumber } from '../../lib/utils/format';
+import { formatLabel } from '../../lib/utils/format';
 import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
 import { SparkBarList } from '../../components/SparkBarList';
@@ -233,7 +234,7 @@ export function AlertsPage() {
               label: 'Severity',
               render: (row) => {
                 const Icon = severityIcon(row.severity);
-                return <span className={`status-pill ${severityClass(row.severity)}`}><Icon size={14} strokeWidth={2} />{row.severity}</span>;
+                return <span className={`status-pill ${severityClass(row.severity)}`}><Icon size={14} strokeWidth={2} />{formatLabel(row.severity)}</span>;
               }
             },
             { key: 'title', label: 'Alert', render: (row) => row.title },
@@ -281,7 +282,7 @@ export function AlertsPage() {
               label: 'Severity',
               render: (row) => {
                 const Icon = severityIcon(row.severity);
-                return <span className={`status-pill ${severityClass(row.severity)}`}><Icon size={14} strokeWidth={2} />{row.severity}</span>;
+                return <span className={`status-pill ${severityClass(row.severity)}`}><Icon size={14} strokeWidth={2} />{formatLabel(row.severity)}</span>;
               }
             },
             { key: 'type', label: 'Type', render: (row) => row.type },

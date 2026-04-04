@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import { useQuery } from '@tanstack/react-query';
-import { Cloud, Map, ShoppingCart, TriangleAlert, Users, Wind } from 'lucide-react';
+import { Cloud, Map as MapIcon, ShoppingCart, TriangleAlert, Users, Wind } from 'lucide-react';
 import { api } from '../../lib/api/client';
 import { cityMeta } from '../../lib/cityMeta';
 import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
 import { formatNumber } from '../../lib/utils/format';
+import { formatLabel } from '../../lib/utils/format';
 import { useMonitorFilters } from '../../store/filters';
 
 function enrichCity(cities, weather, aqi, liveBreakdown, disruptionRows) {
@@ -34,21 +35,21 @@ function enrichCity(cities, weather, aqi, liveBreakdown, disruptionRows) {
 function getMarkerStyle(mode, city) {
   if (mode === 'weather') {
     const severity = Number(city.weather?.weatherSeverityScore || 0);
-    return { radius: 6 + severity * 18, color: severity > 0.6 ? '#fb7185' : severity > 0.3 ? '#f59e0b' : '#38bdf8' };
+    return { radius: 6 + severity * 18, color: severity > 0.6 ? '#EF4444' : severity > 0.3 ? '#F59E0B' : '#06B6D4' };
   }
   if (mode === 'aqi') {
     const aqi = Number(city.aqi?.aqi || 0);
-    return { radius: 6 + Math.min(aqi / 35, 16), color: aqi > 300 ? '#ef4444' : aqi > 180 ? '#f97316' : '#22c55e' };
+    return { radius: 6 + Math.min(aqi / 35, 16), color: aqi > 300 ? '#EF4444' : aqi > 180 ? '#F59E0B' : '#10B981' };
   }
   if (mode === 'live') {
     const liveOrders = Number(city.live?.liveOrders || 0);
-    return { radius: 6 + Math.min(liveOrders / 4, 18), color: liveOrders > 40 ? '#f97316' : liveOrders > 15 ? '#38bdf8' : '#94a3b8' };
+    return { radius: 6 + Math.min(liveOrders / 4, 18), color: liveOrders > 40 ? '#2563EB' : liveOrders > 15 ? '#06B6D4' : '#94A3B8' };
   }
   if (mode === 'disruption') {
     const disruption = Number(city.disruption?.disruptionScore || 0);
-    return { radius: 6 + disruption * 20, color: disruption > 0.75 ? '#ef4444' : disruption > 0.45 ? '#f59e0b' : '#22c55e' };
+    return { radius: 6 + disruption * 20, color: disruption > 0.75 ? '#EF4444' : disruption > 0.45 ? '#F59E0B' : '#10B981' };
   }
-  return { radius: 6 + Math.min((city.drivers || 0) / 800, 16), color: city.drivers > 3000 ? '#22c55e' : city.drivers > 1000 ? '#38bdf8' : '#94a3b8' };
+  return { radius: 6 + Math.min((city.drivers || 0) / 800, 16), color: city.drivers > 3000 ? '#10B981' : city.drivers > 1000 ? '#2563EB' : '#94A3B8' };
 }
 
 export function MapsPage() {
@@ -154,7 +155,7 @@ export function MapsPage() {
           <div className="panel-header">
             <div className="panel-heading">
               <div className="panel-title-row">
-                <span className="panel-icon"><Map size={16} strokeWidth={2} /></span>
+                <span className="panel-icon"><MapIcon size={16} strokeWidth={2} /></span>
                 <h2>India Operations Map</h2>
               </div>
               <span className="panel-caption">Switch the signal layer to compare different operational dimensions.</span>
@@ -234,7 +235,7 @@ export function MapsPage() {
           rowKey={(_, index) => index}
           columns={[
             { key: 'city', label: 'City', render: (row) => row.city },
-            { key: 'tier', label: 'Tier', render: (row) => row.tier },
+            { key: 'tier', label: 'Tier', render: (row) => formatLabel(row.tier) },
             { key: 'drivers', label: 'Drivers', render: (row) => formatNumber(row.drivers) },
             { key: 'liveOrders', label: 'Live', render: (row) => formatNumber(row.liveOrders) },
             { key: 'disruption', label: 'Disruption', render: (row) => row.disruption },

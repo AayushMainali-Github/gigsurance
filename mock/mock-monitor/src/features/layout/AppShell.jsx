@@ -31,17 +31,12 @@ export function AppShell({ children }) {
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-mark">MM</div>
-          <div>
+          <div className="brand-copy">
             <div className="brand-title">
               Gigsurance mock-monitor
-              <span className="brand-status-dot" aria-hidden="true" />
             </div>
             <div className="brand-subtitle">Monitoring Workspace</div>
           </div>
-        </div>
-        <div className="sidebar-intro card">
-          <span className="eyebrow">Interface Refresh</span>
-          <p>Cleaner read paths for weather, fleet, payout, and city-level mock signals.</p>
         </div>
         <nav className="nav">
           {navItems.map(({ label, to, description, group }, index) => (

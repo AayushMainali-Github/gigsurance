@@ -1,4 +1,5 @@
 import { BarChart3, Building2, Cloud, Layers3, MapPin, Shapes, Wind } from 'lucide-react';
+import { formatLabel } from '../lib/utils/format';
 
 function getPanelIcon(title) {
   const normalized = String(title || '').toLowerCase();
@@ -33,7 +34,7 @@ export function SparkBarList({ title, items, valueKey, labelKey, formatter = (va
           return (
             <div key={`${item[labelKey]}-${value}`} className="bar-row">
               <div className="bar-row-head">
-                <span className="bar-row-label">{item[labelKey]}</span>
+                <span className="bar-row-label">{formatLabel(item[labelKey])}</span>
                 <strong>{formatter(value)}</strong>
               </div>
               <div className="bar-track"><div className="bar-fill" style={{ width: `${width}%` }} /></div>

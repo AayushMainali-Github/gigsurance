@@ -5,18 +5,19 @@ import { Area, AreaChart, CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis 
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
 import { formatNumber } from '../../lib/utils/format';
+import { formatLabel } from '../../lib/utils/format';
 import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
 import { ChartPanel } from '../../components/ChartPanel';
 
-const chartGrid = '#F3F4F6';
-const axisStroke = '#9CA3AF';
+const chartGrid = '#E5E7EB';
+const axisStroke = '#94A3B8';
 const tooltipStyle = {
   background: '#FFFFFF',
-  border: '1px solid #F3F4F6',
+  border: '1px solid #E5E7EB',
   borderRadius: 12,
-  color: '#111827',
-  boxShadow: '0 8px 24px rgba(0,0,0,0.08)'
+  color: '#0F172A',
+  boxShadow: '0 8px 24px rgba(15,23,42,0.08)'
 };
 
 function riskTone(riskBand) {
@@ -73,7 +74,7 @@ export function DriversPage() {
         </div>
         <div className="hero-side">
           <div><span>Drivers In View</span><strong>{formatNumber(driversQuery.data?.total || 0)}</strong></div>
-          <div><span>Selected Risk Band</span><strong>{riskSummary.riskBand || 'None'}</strong></div>
+          <div><span>Selected Risk Band</span><strong>{formatLabel(riskSummary.riskBand || 'None')}</strong></div>
         </div>
       </section>
       <section className="metric-grid">
@@ -111,7 +112,7 @@ export function DriversPage() {
           rowKey={(_, index) => index}
           columns={[
             { key: 'city', label: 'City', render: (row) => row.city },
-            { key: 'tier', label: 'Tier', render: (row) => String(row.tier || '').toUpperCase() },
+            { key: 'tier', label: 'Tier', render: (row) => formatLabel(row.tier) },
             { key: 'archetype', label: 'Archetype', render: (row) => row.archetype },
             { key: 'shift', label: 'Shift', render: (row) => row.shift },
             { key: 'sensitivity', label: 'Sensitivity', render: (row) => row.sensitivity },
@@ -136,7 +137,7 @@ export function DriversPage() {
               label: 'Risk',
               render: (row) => {
                 const Icon = riskIcon(row.riskBand);
-                return <span className={`status-pill ${riskTone(row.riskBand)}`}><Icon size={14} strokeWidth={2} />{row.riskBand}</span>;
+                return <span className={`status-pill ${riskTone(row.riskBand)}`}><Icon size={14} strokeWidth={2} />{formatLabel(row.riskBand)}</span>;
               }
             },
             { key: 'totalGigs', label: 'Gigs', render: (row) => formatNumber(row.totalGigs) },
@@ -153,11 +154,11 @@ export function DriversPage() {
           <LineChart data={dailyTrend}>
             <CartesianGrid stroke={chartGrid} vertical={false} />
             <XAxis dataKey="dateKey" stroke={axisStroke} tick={{ fill: axisStroke, fontSize: 11 }} />
-            <YAxis yAxisId="left" stroke="#6366F1" tick={{ fill: axisStroke, fontSize: 11 }} />
-            <YAxis yAxisId="right" orientation="right" stroke="#8B5CF6" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#2563EB" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#7C3AED" tick={{ fill: axisStroke, fontSize: 11 }} />
             <Tooltip contentStyle={tooltipStyle} />
-            <Line yAxisId="left" type="monotone" dataKey="gigs" stroke="#6366F1" strokeWidth={2.5} dot={false} />
-            <Line yAxisId="right" type="monotone" dataKey="avgDuration" stroke="#8B5CF6" strokeWidth={2.5} dot={false} />
+            <Line yAxisId="left" type="monotone" dataKey="gigs" stroke="#2563EB" strokeWidth={2.5} dot={false} />
+            <Line yAxisId="right" type="monotone" dataKey="avgDuration" stroke="#7C3AED" strokeWidth={2.5} dot={false} />
           </LineChart>
         </ChartPanel>
         <ChartPanel
@@ -167,11 +168,11 @@ export function DriversPage() {
           <AreaChart data={dailyTrend}>
             <CartesianGrid stroke={chartGrid} vertical={false} />
             <XAxis dataKey="dateKey" stroke={axisStroke} tick={{ fill: axisStroke, fontSize: 11 }} />
-            <YAxis yAxisId="left" stroke="#6366F1" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#F59E0B" tick={{ fill: axisStroke, fontSize: 11 }} />
             <YAxis yAxisId="right" orientation="right" stroke="#F59E0B" tick={{ fill: axisStroke, fontSize: 11 }} />
             <Tooltip contentStyle={tooltipStyle} />
-            <Area yAxisId="left" type="monotone" dataKey="avgWeather" stroke="#6366F1" fill="rgba(99,102,241,0.18)" />
-            <Line yAxisId="right" type="monotone" dataKey="avgPay" stroke="#F59E0B" strokeWidth={2.5} dot={false} />
+            <Area yAxisId="left" type="monotone" dataKey="avgWeather" stroke="#F59E0B" fill="rgba(245,158,11,0.14)" />
+            <Line yAxisId="right" type="monotone" dataKey="avgPay" stroke="#2563EB" strokeWidth={2.5} dot={false} />
           </AreaChart>
         </ChartPanel>
         <PanelTable

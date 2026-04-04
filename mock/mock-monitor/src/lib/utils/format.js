@@ -4,5 +4,9 @@ export function formatNumber(value) {
 
 export function formatLabel(value) {
   if (!value) return 'All';
-  return value;
+  const normalized = String(value).replaceAll('_', ' ').trim();
+  if (!normalized) return 'All';
+  return normalized
+    .replace(/tier\s*(\d+)/gi, 'Tier $1')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }

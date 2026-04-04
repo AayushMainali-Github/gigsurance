@@ -15,6 +15,7 @@ import {
   UserRound,
   Wind
 } from 'lucide-react';
+import { formatLabel } from '../lib/utils/format';
 
 function getPanelIcon(title) {
   const normalized = String(title || '').toLowerCase();
@@ -54,11 +55,11 @@ function isNumericColumn(label, value) {
 function renderTierBadge(value) {
   const normalized = String(value || '').toLowerCase();
   const tone = normalized === 'tier1' ? 'tier1' : normalized === 'tier2' ? 'tier2' : 'tier3';
-  return <span className={`table-badge table-badge-${tone}`}>{String(value || '').toUpperCase()}</span>;
+  return <span className={`table-badge table-badge-${tone}`}>{formatLabel(value)}</span>;
 }
 
 function renderCategoryBadge(value) {
-  return <span className="table-badge table-badge-neutral">{String(value || '').replaceAll('_', ' ')}</span>;
+  return <span className="table-badge table-badge-neutral">{formatLabel(value)}</span>;
 }
 
 function renderMetricChip(label, value) {

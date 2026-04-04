@@ -20,14 +20,14 @@ import { PanelTable } from '../../components/PanelTable';
 import { SparkBarList } from '../../components/SparkBarList';
 import { ChartPanel } from '../../components/ChartPanel';
 
-const chartGrid = '#F3F4F6';
-const axisStroke = '#9CA3AF';
+const chartGrid = '#E5E7EB';
+const axisStroke = '#94A3B8';
 const tooltipStyle = {
   background: '#FFFFFF',
-  border: '1px solid #F3F4F6',
+  border: '1px solid #E5E7EB',
   borderRadius: 12,
-  color: '#111827',
-  boxShadow: '0 8px 24px rgba(0,0,0,0.08)'
+  color: '#0F172A',
+  boxShadow: '0 8px 24px rgba(15,23,42,0.08)'
 };
 
 function buildQuery({ city, platformName, state }) {
@@ -145,13 +145,13 @@ export function AnalyticsPage() {
           <ComposedChart data={trendRows}>
             <CartesianGrid stroke={chartGrid} vertical={false} />
             <XAxis dataKey="dateKey" stroke={axisStroke} tick={{ fill: axisStroke, fontSize: 11 }} />
-            <YAxis yAxisId="left" stroke="#6366F1" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#2563EB" tick={{ fill: axisStroke, fontSize: 11 }} />
             <YAxis yAxisId="right" orientation="right" stroke="#F59E0B" tick={{ fill: axisStroke, fontSize: 11 }} />
             <Tooltip
               contentStyle={tooltipStyle}
-              labelStyle={{ color: '#111827', fontWeight: 600 }}
+              labelStyle={{ color: '#0F172A', fontWeight: 600 }}
             />
-            <Area yAxisId="left" type="monotone" dataKey="disruptionScore" stroke="#6366F1" fill="rgba(99,102,241,0.18)" />
+            <Area yAxisId="left" type="monotone" dataKey="disruptionScore" stroke="#2563EB" fill="rgba(37,99,235,0.14)" />
             <Line yAxisId="right" type="monotone" dataKey="avgDurationMinutes" stroke="#F59E0B" strokeWidth={2.5} dot={false} />
           </ComposedChart>
         </ChartPanel>
@@ -163,14 +163,14 @@ export function AnalyticsPage() {
           <ComposedChart data={trendRows}>
             <CartesianGrid stroke={chartGrid} vertical={false} />
             <XAxis dataKey="dateKey" stroke={axisStroke} tick={{ fill: axisStroke, fontSize: 11 }} />
-            <YAxis yAxisId="left" stroke="#4F46E5" tick={{ fill: axisStroke, fontSize: 11 }} />
-            <YAxis yAxisId="right" orientation="right" stroke="#8B5CF6" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#06B6D4" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#7C3AED" tick={{ fill: axisStroke, fontSize: 11 }} />
             <Tooltip
               contentStyle={tooltipStyle}
-              labelStyle={{ color: '#111827', fontWeight: 600 }}
+              labelStyle={{ color: '#0F172A', fontWeight: 600 }}
             />
-            <Area yAxisId="left" type="monotone" dataKey="gigs" stroke="#4F46E5" fill="rgba(79,70,229,0.16)" />
-            <Line yAxisId="right" type="monotone" dataKey="avgAmountPaid" stroke="#8B5CF6" strokeWidth={2.5} dot={false} />
+            <Area yAxisId="left" type="monotone" dataKey="gigs" stroke="#06B6D4" fill="rgba(6,182,212,0.14)" />
+            <Line yAxisId="right" type="monotone" dataKey="avgAmountPaid" stroke="#7C3AED" strokeWidth={2.5} dot={false} />
           </ComposedChart>
         </ChartPanel>
 
@@ -199,7 +199,7 @@ export function AnalyticsPage() {
               contentStyle={tooltipStyle}
               formatter={(value, name) => [value, name === 'x' ? 'Disruption' : name === 'y' ? 'Avg Duration' : name]}
             />
-            <Scatter data={scatterRows} fill="#6366F1" />
+            <Scatter data={scatterRows} fill="#2563EB" />
           </ScatterChart>
         </ChartPanel>
 
