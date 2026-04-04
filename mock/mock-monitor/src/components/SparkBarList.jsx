@@ -2,7 +2,10 @@ export function SparkBarList({ title, items, valueKey, labelKey, formatter = (va
   const maxValue = Math.max(...items.map((item) => Number(item[valueKey] || 0)), 1);
   return (
     <section className="card panel">
-      <div className="panel-header"><h2>{title}</h2></div>
+      <div className="panel-header">
+        <div><h2>{title}</h2></div>
+        <span className="panel-meta">{items.length} items</span>
+      </div>
       <div className="bar-list">
         {items.length ? items.map((item) => {
           const value = Number(item[valueKey] || 0);

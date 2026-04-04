@@ -48,6 +48,17 @@ export function DriversPage() {
 
   return (
     <div className="dashboard-stack">
+      <section className="hero card">
+        <div>
+          <span className="eyebrow">Driver Monitoring</span>
+          <h2>Profiles, exposure, and recent behavior</h2>
+          <p>Move from the driver list into a focused profile view with clearer risk context, trend lines, and recent gig history.</p>
+        </div>
+        <div className="hero-side">
+          <div><span>Drivers In View</span><strong>{formatNumber(driversQuery.data?.total || 0)}</strong></div>
+          <div><span>Selected Risk Band</span><strong>{riskSummary.riskBand || 'None'}</strong></div>
+        </div>
+      </section>
       <section className="metric-grid">
         <StatCard title="Visible Drivers" value={formatNumber(driversQuery.data?.total || 0)} subtitle="Current filtered result set" tone="accent" />
         <StatCard title="Selected Driver" value={detail?.platformDriverId || '-'} subtitle={detail?.platformName || 'No driver selected'} />
@@ -83,7 +94,7 @@ export function DriversPage() {
           rowKey={(_, index) => index}
           columns={[
             { key: 'city', label: 'City', render: (row) => row.city },
-            { key: 'tier', label: 'Tier', render: (row) => row.tier },
+            { key: 'tier', label: 'Tier', render: (row) => String(row.tier || '').toUpperCase() },
             { key: 'archetype', label: 'Archetype', render: (row) => row.archetype },
             { key: 'shift', label: 'Shift', render: (row) => row.shift },
             { key: 'sensitivity', label: 'Sensitivity', render: (row) => row.sensitivity },

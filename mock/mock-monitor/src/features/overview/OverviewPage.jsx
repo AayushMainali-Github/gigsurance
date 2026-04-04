@@ -37,7 +37,7 @@ export function OverviewPage() {
         <div>
           <span className="eyebrow">Network Snapshot</span>
           <h2>System-wide operational posture</h2>
-          <p>Fast view of fleet size, environmental pressure, and platform distribution across the seeded mock network.</p>
+          <p>A calm readout of fleet coverage, environmental pressure, and platform mix across the seeded mock network.</p>
         </div>
         <div className="hero-side">
           <div><span>Avg Weather Severity</span><strong>{avgSeverity(weather, 'weatherSeverityScore')}</strong></div>
@@ -46,7 +46,7 @@ export function OverviewPage() {
       </section>
 
       <section className="metric-grid">
-        <StatCard title="Drivers" value={formatNumber(overview?.drivers)} subtitle="Total driver docs in deliverydrivers" tone="accent" />
+        <StatCard title="Drivers" value={formatNumber(overview?.drivers)} subtitle="Total driver records in the delivery collection" tone="accent" />
         <StatCard title="Tracked Cities" value={formatNumber(citiesQuery.data?.count)} subtitle="Cities with current fleet presence" />
         <StatCard title="Weather Snapshots" value={formatNumber(overview?.weatherSnapshots)} subtitle="Stored weather records" />
         <StatCard title="AQI Snapshots" value={formatNumber(overview?.aqiSnapshots)} subtitle="Stored AQI records" />
@@ -63,7 +63,7 @@ export function OverviewPage() {
           columns={[
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'state', label: 'State', render: (row) => row.state },
-            { key: 'tier', label: 'Tier', render: (row) => row.cityTier },
+            { key: 'tier', label: 'Tier', render: (row) => String(row.cityTier || '').toUpperCase() },
             { key: 'drivers', label: 'Drivers', render: (row) => formatNumber(row.drivers) }
           ]}
         />
@@ -75,8 +75,8 @@ export function OverviewPage() {
           columns={[
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'condition', label: 'Condition', render: (row) => row.conditionMain },
-            { key: 'temp', label: 'Temp', render: (row) => `${row.tempC} C` },
-            { key: 'severity', label: 'Severity', render: (row) => row.weatherSeverityScore }
+            { key: 'temp', label: 'Temperature', render: (row) => `${row.tempC} C` },
+            { key: 'severity', label: 'Severity', render: (row) => Number(row.weatherSeverityScore || 0).toFixed(3) }
           ]}
         />
         <PanelTable
@@ -88,7 +88,7 @@ export function OverviewPage() {
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'aqi', label: 'AQI', render: (row) => row.aqi },
             { key: 'category', label: 'Category', render: (row) => row.category },
-            { key: 'severity', label: 'Severity', render: (row) => row.severityScore }
+            { key: 'severity', label: 'Severity', render: (row) => Number(row.severityScore || 0).toFixed(3) }
           ]}
         />
         <PanelTable

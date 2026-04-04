@@ -32,6 +32,17 @@ export function DeliveryPage() {
 
   return (
     <div className="dashboard-stack">
+      <section className="hero card">
+        <div>
+          <span className="eyebrow">Delivery Operations</span>
+          <h2>Driver volume and payout quality in one view</h2>
+          <p>Track the current delivery slice with clearer emphasis on platform mix, payout averages, and the newest driver records.</p>
+        </div>
+        <div className="hero-side">
+          <div><span>Platforms Visible</span><strong>{driverCounts.length}</strong></div>
+          <div><span>Result Scope</span><strong>{formatNumber(totalDrivers)}</strong></div>
+        </div>
+      </section>
       <section className="metric-grid">
         <StatCard title="Matching Drivers" value={formatNumber(totalDrivers)} subtitle="Filtered active driver base" tone="accent" />
         <StatCard title="Tracked Gigs" value={formatNumber(totalGigs)} subtitle="Across the current result slice" />
@@ -62,7 +73,7 @@ export function DeliveryPage() {
             { key: 'driver', label: 'Driver', render: (row) => row.platformDriverId },
             { key: 'platform', label: 'Platform', render: (row) => row.platformName },
             { key: 'city', label: 'City', render: (row) => row.city },
-            { key: 'tier', label: 'Tier', render: (row) => row.cityTier },
+            { key: 'tier', label: 'Tier', render: (row) => String(row.cityTier || '').toUpperCase() },
             { key: 'archetype', label: 'Archetype', render: (row) => row.driverProfile?.archetype },
             { key: 'sensitivity', label: 'Sensitivity', render: (row) => row.driverProfile?.weatherSensitivity }
           ]}

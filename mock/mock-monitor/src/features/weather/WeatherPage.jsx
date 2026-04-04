@@ -25,6 +25,17 @@ export function WeatherPage() {
 
   return (
     <div className="dashboard-stack">
+      <section className="hero card">
+        <div>
+          <span className="eyebrow">Weather Monitoring</span>
+          <h2>Operational weather with less noise</h2>
+          <p>Review the latest city conditions, rain load, wind movement, and heat stress in a cleaner monitoring layout.</p>
+        </div>
+        <div className="hero-side">
+          <div><span>Latest Cities</span><strong>{latestItems.length}</strong></div>
+          <div><span>Recent Samples</span><strong>{snapshots.length}</strong></div>
+        </div>
+      </section>
       <section className="metric-grid">
         <StatCard title="Latest Cities Visible" value={String(latestItems.length)} subtitle="Latest weather cards in current scope" tone="accent" />
         <StatCard title="Avg Severity" value={avgSeverity} subtitle="Across the latest visible cities" />
@@ -41,8 +52,8 @@ export function WeatherPage() {
           columns={[
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'condition', label: 'Condition', render: (row) => row.conditionMain },
-            { key: 'temp', label: 'Temp', render: (row) => `${row.tempC} C` },
-            { key: 'severity', label: 'Severity', render: (row) => row.weatherSeverityScore }
+            { key: 'temp', label: 'Temperature', render: (row) => `${row.tempC} C` },
+            { key: 'severity', label: 'Severity', render: (row) => Number(row.weatherSeverityScore || 0).toFixed(3) }
           ]}
         />
         <PanelTable
@@ -52,10 +63,10 @@ export function WeatherPage() {
           rowKey={(row) => `${row.city}-${row.tsUnix}`}
           columns={[
             { key: 'city', label: 'City', render: (row) => row.city },
-            { key: 'time', label: 'Time', render: (row) => row.tsUnix },
-            { key: 'rain', label: 'Rain', render: (row) => row.rainMm },
-            { key: 'wind', label: 'Wind', render: (row) => row.windKph },
-            { key: 'heat', label: 'Heat Risk', render: (row) => row.heatRisk }
+            { key: 'time', label: 'Timestamp', render: (row) => row.tsUnix },
+            { key: 'rain', label: 'Rain (mm)', render: (row) => row.rainMm },
+            { key: 'wind', label: 'Wind (kph)', render: (row) => row.windKph },
+            { key: 'heat', label: 'Heat Risk', render: (row) => Number(row.heatRisk || 0).toFixed(3) }
           ]}
         />
       </section>

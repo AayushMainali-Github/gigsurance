@@ -2,8 +2,11 @@ export function PanelTable({ title, caption, columns, rows, rowKey }) {
   return (
     <section className="card panel">
       <div className="panel-header">
-        <h2>{title}</h2>
-        {caption ? <span className="panel-caption">{caption}</span> : null}
+        <div>
+          <h2>{title}</h2>
+          {caption ? <span className="panel-caption">{caption}</span> : null}
+        </div>
+        <span className="panel-meta">{rows.length} rows</span>
       </div>
       <div className="table-wrap">
         <table>
