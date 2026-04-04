@@ -1,11 +1,11 @@
 {
   "model_family": "xgboost_regressor",
-  "rows_train": 366665,
-  "rows_test": 91928,
+  "rows_train": 364019,
+  "rows_test": 91836,
   "metrics": {
-    "mae": 254.70044026799155,
-    "median_ae": 173.06609619140636,
-    "rmse": 353.68215349628065,
-    "mean_prediction": 1077.4754638671875
+    "mae": 242.61731276074792,
+    "median_ae": 167.95411437988278,
+    "rmse": 334.5144171990638,
+    "mean_prediction": 1076.978759765625
   }
 }

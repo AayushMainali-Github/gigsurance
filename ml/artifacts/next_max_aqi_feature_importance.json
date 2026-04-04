@@ -2,103 +2,103 @@
   "top_features": [
     {
       "feature": "max_aqi_lag_1",
-      "weight": 0.06666916608810425
+      "weight": 0.06296176463365555
     },
     {
       "feature": "max_aqi_lag_2",
-      "weight": 0.03645029664039612
+      "weight": 0.043727923184633255
     },
     {
       "feature": "max_aqi_lag_7",
-      "weight": 0.03284362331032753
+      "weight": 0.033456455916166306
     },
     {
       "feature": "state_Uttar Pradesh",
-      "weight": 0.027908632531762123
+      "weight": 0.026071961969137192
     },
     {
       "feature": "max_aqi_lag_3",
-      "weight": 0.027331270277500153
-    },
-    {
-      "feature": "max_aqi_rollmean_3",
-      "weight": 0.014367408119142056
+      "weight": 0.023989353328943253
     },
     {
       "feature": "max_aqi_lag_14",
-      "weight": 0.01383283268660307
-    },
-    {
-      "feature": "state_Chandigarh",
-      "weight": 0.011867950670421124
-    },
-    {
-      "feature": "city_Srinagar",
-      "weight": 0.011455767787992954
+      "weight": 0.01661623828113079
     },
     {
       "feature": "state_Delhi",
-      "weight": 0.01137306448072195
+      "weight": 0.014992600306868553
+    },
+    {
+      "feature": "max_aqi_rollmean_3",
+      "weight": 0.013460221700370312
     },
     {
       "feature": "city_Delhi",
-      "weight": 0.011198687367141247
+      "weight": 0.011424141004681587
+    },
+    {
+      "feature": "city_Srinagar",
+      "weight": 0.011092877946794033
     },
     {
       "feature": "max_aqi_rollmean_7",
-      "weight": 0.01109242346137762
-    },
-    {
-      "feature": "city_Madurai",
-      "weight": 0.010417649522423744
-    },
-    {
-      "feature": "city_Jammu",
-      "weight": 0.009361382573843002
-    },
-    {
-      "feature": "city_Maheshtala",
-      "weight": 0.008831665851175785
-    },
-    {
-      "feature": "state_Madhya Pradesh",
-      "weight": 0.008418895304203033
-    },
-    {
-      "feature": "city_Gaya",
-      "weight": 0.008143089711666107
-    },
-    {
-      "feature": "city_Bokaro",
-      "weight": 0.008086289279162884
-    },
-    {
-      "feature": "city_Lucknow",
-      "weight": 0.008075568825006485
+      "weight": 0.01010300312191248
     },
     {
       "feature": "state_Jammu and Kashmir",
-      "weight": 0.008061558939516544
+      "weight": 0.008904388174414635
     },
     {
-      "feature": "state_Tamil Nadu",
-      "weight": 0.007865157909691334
+      "feature": "city_Jammu",
+      "weight": 0.008352848701179028
     },
     {
-      "feature": "state_Punjab",
-      "weight": 0.007788419723510742
+      "feature": "city_Nanded",
+      "weight": 0.008086551912128925
     },
     {
       "feature": "max_rain_mm_rollmean_7",
-      "weight": 0.007748141884803772
+      "weight": 0.007750265765935183
     },
     {
-      "feature": "city_Asansol",
-      "weight": 0.007690708618611097
+      "feature": "city_Gaya",
+      "weight": 0.007749235723167658
+    },
+    {
+      "feature": "dayofyear",
+      "weight": 0.007734616752713919
+    },
+    {
+      "feature": "state_Punjab",
+      "weight": 0.007629211060702801
     },
     {
       "feature": "city_Noida",
-      "weight": 0.007631211541593075
+      "weight": 0.007604544050991535
+    },
+    {
+      "feature": "city_Sangli",
+      "weight": 0.007474670652300119
+    },
+    {
+      "feature": "state_West Bengal",
+      "weight": 0.007435119245201349
+    },
+    {
+      "feature": "city_Maheshtala",
+      "weight": 0.0073533374816179276
+    },
+    {
+      "feature": "max_heat_risk_rollmean_3",
+      "weight": 0.0071569280698895454
+    },
+    {
+      "feature": "city_Gorakhpur",
+      "weight": 0.007087145000696182
+    },
+    {
+      "feature": "state_Maharashtra",
+      "weight": 0.007031901739537716
     }
   ]
 }
