@@ -17,6 +17,17 @@ export function PlatformsPage() {
 
   return (
     <div className="dashboard-stack">
+      <section className="hero card">
+        <div>
+          <span className="eyebrow">Platform Monitoring</span>
+          <h2>Platform footprint, city spread, and performance summary</h2>
+          <p>Compare delivery platforms through driver presence, city coverage, and the latest gig-performance aggregates.</p>
+        </div>
+        <div className="hero-side">
+          <div><span>Platforms</span><strong>{formatNumber(platforms.length)}</strong></div>
+          <div><span>Selected Platform</span><strong>{activePlatform || 'None'}</strong></div>
+        </div>
+      </section>
       <section className="metric-grid">
         <StatCard title="Platforms" value={formatNumber(platforms.length)} subtitle="Known delivery platforms" tone="accent" />
         <StatCard title="Selected Platform" value={activePlatform || '-'} subtitle="Current platform scope" />

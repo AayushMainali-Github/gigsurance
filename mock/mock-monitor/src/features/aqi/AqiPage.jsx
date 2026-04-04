@@ -25,6 +25,17 @@ export function AqiPage() {
 
   return (
     <div className="dashboard-stack">
+      <section className="hero card">
+        <div>
+          <span className="eyebrow">Air Quality Monitoring</span>
+          <h2>City pollution conditions in a cleaner operational layout</h2>
+          <p>Track the latest AQI readings, severe air quality pockets, and recent pollution snapshots across the current monitor scope.</p>
+        </div>
+        <div className="hero-side">
+          <div><span>Latest Cities</span><strong>{latestItems.length}</strong></div>
+          <div><span>Severe Cities</span><strong>{severeCount}</strong></div>
+        </div>
+      </section>
       <section className="metric-grid">
         <StatCard title="Latest Cities Visible" value={String(latestItems.length)} subtitle="Latest AQI cards in current scope" tone="accent" />
         <StatCard title="Average AQI" value={avgAqi} subtitle="Across the latest visible cities" />
@@ -42,7 +53,7 @@ export function AqiPage() {
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'aqi', label: 'AQI', render: (row) => row.aqi },
             { key: 'category', label: 'Category', render: (row) => row.category },
-            { key: 'severity', label: 'Severity', render: (row) => row.severityScore }
+            { key: 'severity', label: 'Severity', render: (row) => Number(row.severityScore || 0).toFixed(3) }
           ]}
         />
         <PanelTable

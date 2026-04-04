@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
+import { Activity, Bell, Clock3 } from 'lucide-react';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
 import { formatNumber } from '../../lib/utils/format';
@@ -12,6 +13,12 @@ function statusTone(status) {
   if (status === 'in_transit') return 'status-live';
   if (status === 'recently_delivered') return 'status-complete';
   return 'status-pending';
+}
+
+function statusIcon(status) {
+  if (status === 'in_transit') return Activity;
+  if (status === 'recently_delivered') return Bell;
+  return Clock3;
 }
 
 function formatStatus(status) {
@@ -79,19 +86,27 @@ export function LivePage() {
         <SparkBarList title="Live Orders by Platform" items={platformBreakdown} valueKey="liveOrders" labelKey="_id" formatter={formatNumber} />
         <section className="card panel">
           <div className="panel-header">
-            <h2>Operational Notes</h2>
-            <span className="panel-caption">Derived from embedded gig history</span>
+            <div className="panel-heading">
+              <div className="panel-title-row">
+                <span className="panel-icon"><Bell size={16} strokeWidth={2} /></span>
+                <h2>Operational Notes</h2>
+              </div>
+              <span className="panel-caption">Derived from embedded gig history</span>
+            </div>
           </div>
           <div className="live-notes">
             <div className="live-note">
+              <Clock3 size={16} strokeWidth={2} />
               <strong>{Number(summary.avgDuration || 0).toFixed(2)} min</strong>
               <span>Average duration in the active window</span>
             </div>
             <div className="live-note">
+              <Activity size={16} strokeWidth={2} />
               <strong>{formatNumber(items.length)}</strong>
               <span>Visible live orders in the current page slice</span>
             </div>
             <div className="live-note">
+              <Bell size={16} strokeWidth={2} />
               <strong>{city || 'All cities'}</strong>
               <span>Current city filter</span>
             </div>
@@ -104,7 +119,14 @@ export function LivePage() {
           rowKey={(row) => row.gig.gigId}
           columns={[
             { key: 'gig', label: 'Gig', render: (row) => row.gig.gigId },
-            { key: 'status', label: 'Status', render: (row) => <span className={`status-pill ${statusTone(row.liveStatus)}`}>{formatStatus(row.liveStatus)}</span> },
+            {
+              key: 'status',
+              label: 'Status',
+              render: (row) => {
+                const Icon = statusIcon(row.liveStatus);
+                return <span className={`status-pill ${statusTone(row.liveStatus)}`}><Icon size={14} strokeWidth={2} />{formatStatus(row.liveStatus)}</span>;
+              }
+            },
             { key: 'platform', label: 'Platform', render: (row) => row.platformName },
             { key: 'driver', label: 'Driver', render: (row) => row.platformDriverId },
             { key: 'city', label: 'City', render: (row) => row.city },

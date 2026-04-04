@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { AlertTriangle, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
@@ -8,10 +9,26 @@ import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
 import { ChartPanel } from '../../components/ChartPanel';
 
+const chartGrid = '#F3F4F6';
+const axisStroke = '#9CA3AF';
+const tooltipStyle = {
+  background: '#FFFFFF',
+  border: '1px solid #F3F4F6',
+  borderRadius: 12,
+  color: '#111827',
+  boxShadow: '0 8px 24px rgba(0,0,0,0.08)'
+};
+
 function riskTone(riskBand) {
   if (riskBand === 'high') return 'status-critical';
   if (riskBand === 'medium') return 'status-high';
   return 'status-live';
+}
+
+function riskIcon(riskBand) {
+  if (riskBand === 'high') return AlertTriangle;
+  if (riskBand === 'medium') return ShieldAlert;
+  return ShieldCheck;
 }
 
 export function DriversPage() {
@@ -114,7 +131,14 @@ export function DriversPage() {
           }] : []}
           rowKey={(_, index) => index}
           columns={[
-            { key: 'riskBand', label: 'Risk', render: (row) => <span className={`status-pill ${riskTone(row.riskBand)}`}>{row.riskBand}</span> },
+            {
+              key: 'riskBand',
+              label: 'Risk',
+              render: (row) => {
+                const Icon = riskIcon(row.riskBand);
+                return <span className={`status-pill ${riskTone(row.riskBand)}`}><Icon size={14} strokeWidth={2} />{row.riskBand}</span>;
+              }
+            },
             { key: 'totalGigs', label: 'Gigs', render: (row) => formatNumber(row.totalGigs) },
             { key: 'avgPay', label: 'Avg Pay', render: (row) => Number(row.avgPay || 0).toFixed(2) },
             { key: 'avgDuration', label: 'Avg Duration', render: (row) => Number(row.avgDuration || 0).toFixed(2) },
@@ -127,13 +151,13 @@ export function DriversPage() {
           caption="Recent gig volume and average duration"
         >
           <LineChart data={dailyTrend}>
-            <CartesianGrid stroke="rgba(148, 163, 184, 0.15)" vertical={false} />
-            <XAxis dataKey="dateKey" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="left" stroke="#22c55e" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="right" orientation="right" stroke="#f97316" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 12 }} />
-            <Line yAxisId="left" type="monotone" dataKey="gigs" stroke="#22c55e" strokeWidth={2.5} dot={false} />
-            <Line yAxisId="right" type="monotone" dataKey="avgDuration" stroke="#f97316" strokeWidth={2.5} dot={false} />
+            <CartesianGrid stroke={chartGrid} vertical={false} />
+            <XAxis dataKey="dateKey" stroke={axisStroke} tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#6366F1" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#8B5CF6" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Line yAxisId="left" type="monotone" dataKey="gigs" stroke="#6366F1" strokeWidth={2.5} dot={false} />
+            <Line yAxisId="right" type="monotone" dataKey="avgDuration" stroke="#8B5CF6" strokeWidth={2.5} dot={false} />
           </LineChart>
         </ChartPanel>
         <ChartPanel
@@ -141,13 +165,13 @@ export function DriversPage() {
           caption="Recent weather exposure against average payout"
         >
           <AreaChart data={dailyTrend}>
-            <CartesianGrid stroke="rgba(148, 163, 184, 0.15)" vertical={false} />
-            <XAxis dataKey="dateKey" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="left" stroke="#38bdf8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="right" orientation="right" stroke="#facc15" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 12 }} />
-            <Area yAxisId="left" type="monotone" dataKey="avgWeather" stroke="#38bdf8" fill="rgba(56,189,248,0.25)" />
-            <Line yAxisId="right" type="monotone" dataKey="avgPay" stroke="#facc15" strokeWidth={2.5} dot={false} />
+            <CartesianGrid stroke={chartGrid} vertical={false} />
+            <XAxis dataKey="dateKey" stroke={axisStroke} tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#6366F1" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#F59E0B" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Area yAxisId="left" type="monotone" dataKey="avgWeather" stroke="#6366F1" fill="rgba(99,102,241,0.18)" />
+            <Line yAxisId="right" type="monotone" dataKey="avgPay" stroke="#F59E0B" strokeWidth={2.5} dot={false} />
           </AreaChart>
         </ChartPanel>
         <PanelTable

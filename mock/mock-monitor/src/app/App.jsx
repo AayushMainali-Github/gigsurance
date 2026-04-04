@@ -1,3 +1,4 @@
+import { LoaderCircle } from 'lucide-react';
 import { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from '../features/layout/AppShell';
@@ -17,7 +18,10 @@ const AnalyticsPage = lazy(() => import('../features/analytics/AnalyticsPage').t
 function RouteLoader() {
   return (
     <section className="card placeholder-card route-loader">
-      <h2>Loading workspace</h2>
+      <div className="panel-title-row">
+        <span className="panel-icon"><LoaderCircle size={18} strokeWidth={2} /></span>
+        <h2>Loading workspace</h2>
+      </div>
       <p>The selected monitor surface is being loaded.</p>
     </section>
   );

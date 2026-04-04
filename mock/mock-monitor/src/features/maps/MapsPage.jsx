@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import { useQuery } from '@tanstack/react-query';
+import { Cloud, Map, ShoppingCart, TriangleAlert, Users, Wind } from 'lucide-react';
 import { api } from '../../lib/api/client';
 import { cityMeta } from '../../lib/cityMeta';
 import { StatCard } from '../../components/StatCard';
@@ -130,6 +131,17 @@ export function MapsPage() {
 
   return (
     <div className="dashboard-stack">
+      <section className="hero card">
+        <div>
+          <span className="eyebrow">Geographic Monitoring</span>
+          <h2>Map-based operations view across drivers, weather, AQI, and live load</h2>
+          <p>Switch the map mode to inspect how network scale, environmental pressure, and live order concentration move across cities.</p>
+        </div>
+        <div className="hero-side">
+          <div><span>Mapped Cities</span><strong>{formatNumber(mappedCities.length)}</strong></div>
+          <div><span>Current Mode</span><strong>{modeLabel}</strong></div>
+        </div>
+      </section>
       <section className="metric-grid">
         <StatCard title="Mapped Cities" value={formatNumber(mappedCities.length)} subtitle="Cities rendered on the map" tone="accent" />
         <StatCard title="View Mode" value={modeLabel} subtitle="Drivers, weather, AQI, live, or disruption" />
@@ -140,13 +152,19 @@ export function MapsPage() {
       <section className="page-grid map-layout">
         <section className="card panel span-2 map-panel">
           <div className="panel-header">
-            <h2>India Operations Map</h2>
+            <div className="panel-heading">
+              <div className="panel-title-row">
+                <span className="panel-icon"><Map size={16} strokeWidth={2} /></span>
+                <h2>India Operations Map</h2>
+              </div>
+              <span className="panel-caption">Switch the signal layer to compare different operational dimensions.</span>
+            </div>
             <div className="mode-switch">
-              <button className={`mini-button ${mode === 'drivers' ? 'active-pill' : ''}`} onClick={() => setMode('drivers')}>Drivers</button>
-              <button className={`mini-button ${mode === 'weather' ? 'active-pill' : ''}`} onClick={() => setMode('weather')}>Weather</button>
-              <button className={`mini-button ${mode === 'aqi' ? 'active-pill' : ''}`} onClick={() => setMode('aqi')}>AQI</button>
-              <button className={`mini-button ${mode === 'live' ? 'active-pill' : ''}`} onClick={() => setMode('live')}>Live</button>
-              <button className={`mini-button ${mode === 'disruption' ? 'active-pill' : ''}`} onClick={() => setMode('disruption')}>Disruption</button>
+              <button className={`mini-button ${mode === 'drivers' ? 'active-pill' : ''}`} onClick={() => setMode('drivers')}><Users size={16} strokeWidth={2} />Drivers</button>
+              <button className={`mini-button ${mode === 'weather' ? 'active-pill' : ''}`} onClick={() => setMode('weather')}><Cloud size={16} strokeWidth={2} />Weather</button>
+              <button className={`mini-button ${mode === 'aqi' ? 'active-pill' : ''}`} onClick={() => setMode('aqi')}><Wind size={16} strokeWidth={2} />AQI</button>
+              <button className={`mini-button ${mode === 'live' ? 'active-pill' : ''}`} onClick={() => setMode('live')}><ShoppingCart size={16} strokeWidth={2} />Live</button>
+              <button className={`mini-button ${mode === 'disruption' ? 'active-pill' : ''}`} onClick={() => setMode('disruption')}><TriangleAlert size={16} strokeWidth={2} />Disruption</button>
             </div>
           </div>
           <div className="map-frame">

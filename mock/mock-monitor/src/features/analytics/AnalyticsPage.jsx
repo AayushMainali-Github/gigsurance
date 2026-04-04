@@ -20,6 +20,16 @@ import { PanelTable } from '../../components/PanelTable';
 import { SparkBarList } from '../../components/SparkBarList';
 import { ChartPanel } from '../../components/ChartPanel';
 
+const chartGrid = '#F3F4F6';
+const axisStroke = '#9CA3AF';
+const tooltipStyle = {
+  background: '#FFFFFF',
+  border: '1px solid #F3F4F6',
+  borderRadius: 12,
+  color: '#111827',
+  boxShadow: '0 8px 24px rgba(0,0,0,0.08)'
+};
+
 function buildQuery({ city, platformName, state }) {
   const params = new URLSearchParams();
   if (city) params.set('city', city);
@@ -133,16 +143,16 @@ export function AnalyticsPage() {
           caption="Trend of combined disruption and average delivery duration"
         >
           <ComposedChart data={trendRows}>
-            <CartesianGrid stroke="rgba(148, 163, 184, 0.15)" vertical={false} />
-            <XAxis dataKey="dateKey" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="left" stroke="#38bdf8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="right" orientation="right" stroke="#f97316" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <CartesianGrid stroke={chartGrid} vertical={false} />
+            <XAxis dataKey="dateKey" stroke={axisStroke} tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#6366F1" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#F59E0B" tick={{ fill: axisStroke, fontSize: 11 }} />
             <Tooltip
-              contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 12 }}
-              labelStyle={{ color: '#e5eef7' }}
+              contentStyle={tooltipStyle}
+              labelStyle={{ color: '#111827', fontWeight: 600 }}
             />
-            <Area yAxisId="left" type="monotone" dataKey="disruptionScore" stroke="#38bdf8" fill="rgba(56,189,248,0.28)" />
-            <Line yAxisId="right" type="monotone" dataKey="avgDurationMinutes" stroke="#f97316" strokeWidth={2.5} dot={false} />
+            <Area yAxisId="left" type="monotone" dataKey="disruptionScore" stroke="#6366F1" fill="rgba(99,102,241,0.18)" />
+            <Line yAxisId="right" type="monotone" dataKey="avgDurationMinutes" stroke="#F59E0B" strokeWidth={2.5} dot={false} />
           </ComposedChart>
         </ChartPanel>
 
@@ -151,16 +161,16 @@ export function AnalyticsPage() {
           caption="How volume and average payout move through the window"
         >
           <ComposedChart data={trendRows}>
-            <CartesianGrid stroke="rgba(148, 163, 184, 0.15)" vertical={false} />
-            <XAxis dataKey="dateKey" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="left" stroke="#22c55e" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <YAxis yAxisId="right" orientation="right" stroke="#facc15" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+            <CartesianGrid stroke={chartGrid} vertical={false} />
+            <XAxis dataKey="dateKey" stroke={axisStroke} tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="left" stroke="#4F46E5" tick={{ fill: axisStroke, fontSize: 11 }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#8B5CF6" tick={{ fill: axisStroke, fontSize: 11 }} />
             <Tooltip
-              contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 12 }}
-              labelStyle={{ color: '#e5eef7' }}
+              contentStyle={tooltipStyle}
+              labelStyle={{ color: '#111827', fontWeight: 600 }}
             />
-            <Area yAxisId="left" type="monotone" dataKey="gigs" stroke="#22c55e" fill="rgba(34,197,94,0.25)" />
-            <Line yAxisId="right" type="monotone" dataKey="avgAmountPaid" stroke="#facc15" strokeWidth={2.5} dot={false} />
+            <Area yAxisId="left" type="monotone" dataKey="gigs" stroke="#4F46E5" fill="rgba(79,70,229,0.16)" />
+            <Line yAxisId="right" type="monotone" dataKey="avgAmountPaid" stroke="#8B5CF6" strokeWidth={2.5} dot={false} />
           </ComposedChart>
         </ChartPanel>
 
@@ -169,27 +179,27 @@ export function AnalyticsPage() {
           caption="Each point is a city-day-platform slice"
         >
           <ScatterChart>
-            <CartesianGrid stroke="rgba(148, 163, 184, 0.15)" />
+            <CartesianGrid stroke={chartGrid} />
             <XAxis
               type="number"
               dataKey="x"
               name="Disruption"
-              stroke="#94a3b8"
-              tick={{ fill: '#94a3b8', fontSize: 11 }}
+              stroke={axisStroke}
+              tick={{ fill: axisStroke, fontSize: 11 }}
             />
             <YAxis
               type="number"
               dataKey="y"
               name="Avg Duration"
-              stroke="#94a3b8"
-              tick={{ fill: '#94a3b8', fontSize: 11 }}
+              stroke={axisStroke}
+              tick={{ fill: axisStroke, fontSize: 11 }}
             />
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
-              contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 12 }}
+              contentStyle={tooltipStyle}
               formatter={(value, name) => [value, name === 'x' ? 'Disruption' : name === 'y' ? 'Avg Duration' : name]}
             />
-            <Scatter data={scatterRows} fill="#38bdf8" />
+            <Scatter data={scatterRows} fill="#6366F1" />
           </ScatterChart>
         </ChartPanel>
 

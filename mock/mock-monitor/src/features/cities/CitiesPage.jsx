@@ -21,6 +21,17 @@ export function CitiesPage() {
 
   return (
     <div className="dashboard-stack">
+      <section className="hero card">
+        <div>
+          <span className="eyebrow">City Monitoring</span>
+          <h2>Operational coverage by city, environment, and platform mix</h2>
+          <p>Review city-level fleet presence, current environmental conditions, and the dominant platforms in the selected geography.</p>
+        </div>
+        <div className="hero-side">
+          <div><span>Visible Cities</span><strong>{formatNumber(filteredCities.length)}</strong></div>
+          <div><span>Active City</span><strong>{activeCity || 'None'}</strong></div>
+        </div>
+      </section>
       <section className="metric-grid">
         <StatCard title="Visible Cities" value={formatNumber(filteredCities.length)} subtitle="Cities in current filter state" tone="accent" />
         <StatCard title="Selected City Drivers" value={formatNumber(summary?.drivers || dashboard?.driverCount || 0)} subtitle={activeCity || 'No city selected'} />
@@ -38,7 +49,7 @@ export function CitiesPage() {
             { key: 'pick', label: 'Pick', render: (row) => <button className="mini-button" onClick={() => setSelectedCity(row.city)}>{row.city === activeCity ? 'Active' : 'Open'}</button> },
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'state', label: 'State', render: (row) => row.state },
-            { key: 'tier', label: 'Tier', render: (row) => row.cityTier },
+            { key: 'tier', label: 'Tier', render: (row) => String(row.cityTier || '').toUpperCase() },
             { key: 'drivers', label: 'Drivers', render: (row) => formatNumber(row.drivers) }
           ]}
         />

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
+import { AlertTriangle, Bell, Cloud, Truck, Wind } from 'lucide-react';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
 import { formatNumber } from '../../lib/utils/format';
@@ -21,6 +22,12 @@ function severityClass(level) {
   if (level === 'high') return 'status-high';
   if (level === 'medium') return 'status-pending';
   return 'status-complete';
+}
+
+function severityIcon(level) {
+  if (level === 'critical') return AlertTriangle;
+  if (level === 'high') return Bell;
+  return AlertTriangle;
 }
 
 function buildAlerts({ weather, aqi, liveSummary, cityBreakdown, platformBreakdown, scope }) {
@@ -221,7 +228,14 @@ export function AlertsPage() {
           rows={alerts.slice(0, 12)}
           rowKey={(row) => row.id}
           columns={[
-            { key: 'severity', label: 'Severity', render: (row) => <span className={`status-pill ${severityClass(row.severity)}`}>{row.severity}</span> },
+            {
+              key: 'severity',
+              label: 'Severity',
+              render: (row) => {
+                const Icon = severityIcon(row.severity);
+                return <span className={`status-pill ${severityClass(row.severity)}`}><Icon size={14} strokeWidth={2} />{row.severity}</span>;
+              }
+            },
             { key: 'title', label: 'Alert', render: (row) => row.title },
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'metric', label: 'Metric', render: (row) => row.metric },
@@ -230,19 +244,27 @@ export function AlertsPage() {
         />
         <section className="card panel">
           <div className="panel-header">
-            <h2>Alert Logic</h2>
-            <span className="panel-caption">Current frontend-derived rules</span>
+            <div className="panel-heading">
+              <div className="panel-title-row">
+                <span className="panel-icon"><Bell size={16} strokeWidth={2} /></span>
+                <h2>Alert Logic</h2>
+              </div>
+              <span className="panel-caption">Current frontend-derived rules</span>
+            </div>
           </div>
           <div className="live-notes">
             <div className="live-note">
+              <Cloud size={16} strokeWidth={2} />
               <strong>Weather</strong>
               <span>Triggers on high severity, storm, and visibility deterioration.</span>
             </div>
             <div className="live-note">
+              <Wind size={16} strokeWidth={2} />
               <strong>AQI</strong>
               <span>Triggers on very poor and severe air quality bands with stronger priority for severe conditions.</span>
             </div>
             <div className="live-note">
+              <Truck size={16} strokeWidth={2} />
               <strong>Delivery</strong>
               <span>Triggers on unusually high concurrency, duration elevation, and concentrated city or platform pressure.</span>
             </div>
@@ -254,7 +276,14 @@ export function AlertsPage() {
           rows={alerts}
           rowKey={(row) => `${row.id}-ledger`}
           columns={[
-            { key: 'severity', label: 'Severity', render: (row) => <span className={`status-pill ${severityClass(row.severity)}`}>{row.severity}</span> },
+            {
+              key: 'severity',
+              label: 'Severity',
+              render: (row) => {
+                const Icon = severityIcon(row.severity);
+                return <span className={`status-pill ${severityClass(row.severity)}`}><Icon size={14} strokeWidth={2} />{row.severity}</span>;
+              }
+            },
             { key: 'type', label: 'Type', render: (row) => row.type },
             { key: 'city', label: 'City', render: (row) => row.city },
             { key: 'platform', label: 'Platform', render: (row) => row.platform },

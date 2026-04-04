@@ -1,3 +1,4 @@
+import { Building2, MapPin, RotateCcw } from 'lucide-react';
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
@@ -42,7 +43,7 @@ export function FilterBar() {
         <p>Focus the monitor by city, platform, or state. All data views update in place.</p>
       </div>
       <div className="filter-group">
-        <label>City</label>
+        <label><MapPin size={14} strokeWidth={2} /> City</label>
         <select value={city} onChange={(event) => updateFilter('city', event.target.value)}>
           <option value="">All cities</option>
           {cities.map((item) => (
@@ -51,7 +52,7 @@ export function FilterBar() {
         </select>
       </div>
       <div className="filter-group">
-        <label>Platform</label>
+        <label><Building2 size={14} strokeWidth={2} /> Platform</label>
         <select value={platformName} onChange={(event) => updateFilter('platformName', event.target.value)}>
           <option value="">All platforms</option>
           {platforms.map((item) => (
@@ -60,7 +61,7 @@ export function FilterBar() {
         </select>
       </div>
       <div className="filter-group">
-        <label>State</label>
+        <label><MapPin size={14} strokeWidth={2} /> State</label>
         <select value={state} onChange={(event) => updateFilter('state', event.target.value)}>
           <option value="">All states</option>
           {states.map((item) => (
@@ -68,7 +69,10 @@ export function FilterBar() {
           ))}
         </select>
       </div>
-      <button className="reset-button" onClick={clearFilters}>Reset Filters</button>
+      <button className="reset-button" onClick={clearFilters}>
+        <RotateCcw size={16} strokeWidth={2} />
+        <span>Reset Filters</span>
+      </button>
     </section>
   );
 }
