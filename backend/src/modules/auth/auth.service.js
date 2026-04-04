@@ -2,8 +2,9 @@ const bcrypt = require("bcryptjs");
 const User = require("../../models/User");
 const { ApiError } = require("../../utils/ApiError");
 const { signAccessToken } = require("../../utils/jwt");
+const { linkWorkerToUser } = require("../workers/workers.service");
 
-async function signup({ email, password }) {
+async function signup({ email, password, platformName, platformDriverId }) {
   const existing = await User.findOne({ email }).lean();
   if (existing) {
     throw new ApiError(409, "User already exists");
@@ -11,6 +12,7 @@ async function signup({ email, password }) {
 
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await User.create({ email, passwordHash });
+  await linkWorkerToUser(user._id, { platformName, platformDriverId });
   return {
     user,
     accessToken: signAccessToken({ sub: String(user._id), role: user.role, email: user.email })

@@ -1,6 +1,5 @@
-const ExternalWeatherSnapshot = require("../models/ExternalWeatherSnapshot");
-const ExternalAqiSnapshot = require("../models/ExternalAqiSnapshot");
 const IncidentWindow = require("../models/IncidentWindow");
+const { listWeatherSnapshots, listAqiSnapshots } = require("./mockApiClient");
 
 function dayBounds(date = new Date()) {
   const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
@@ -29,34 +28,62 @@ async function detectIncidentsForDate(date = previousDay()) {
   const endUnix = end.getTime();
 
   const [weatherRows, aqiRows] = await Promise.all([
-    ExternalWeatherSnapshot.aggregate([
-      { $match: { tsUnix: { $gte: startUnix, $lte: endUnix } } },
-      {
-        $group: {
-          _id: { city: "$city", state: "$state" },
-          avgWeatherSeverityScore: { $avg: "$weatherSeverityScore" },
-          maxRainMm: { $max: "$rainMm" },
-          maxHeatRisk: { $max: "$heatRisk" },
-          maxStormRisk: { $max: "$stormRisk" }
-        }
-      }
-    ]),
-    ExternalAqiSnapshot.aggregate([
-      { $match: { tsUnix: { $gte: startUnix, $lte: endUnix } } },
-      {
-        $group: {
-          _id: { city: "$city", state: "$state" },
-          avgAqiSeverityScore: { $avg: "$severityScore" },
-          maxAqi: { $max: "$aqi" }
-        }
-      }
-    ])
+    listWeatherSnapshots({ tsFrom: startUnix, tsTo: endUnix, sortBy: "tsUnix", order: "asc" }),
+    listAqiSnapshots({ tsFrom: startUnix, tsTo: endUnix, sortBy: "tsUnix", order: "asc" })
   ]);
 
-  const aqiMap = new Map(aqiRows.map((row) => [`${row._id.city}|${row._id.state}`, row]));
+  const weatherGrouped = new Map();
+  for (const row of weatherRows) {
+    const key = `${row.city}|${row.state}`;
+    const current = weatherGrouped.get(key) || {
+      _id: { city: row.city, state: row.state },
+      count: 0,
+      severitySum: 0,
+      maxRainMm: 0,
+      maxHeatRisk: 0,
+      maxStormRisk: 0
+    };
+    current.count += 1;
+    current.severitySum += Number(row.weatherSeverityScore || 0);
+    current.maxRainMm = Math.max(current.maxRainMm, Number(row.rainMm || 0));
+    current.maxHeatRisk = Math.max(current.maxHeatRisk, Number(row.heatRisk || 0));
+    current.maxStormRisk = Math.max(current.maxStormRisk, Number(row.stormRisk || 0));
+    weatherGrouped.set(key, current);
+  }
+
+  const aqiGrouped = new Map();
+  for (const row of aqiRows) {
+    const key = `${row.city}|${row.state}`;
+    const current = aqiGrouped.get(key) || {
+      _id: { city: row.city, state: row.state },
+      count: 0,
+      severitySum: 0,
+      maxAqi: 0
+    };
+    current.count += 1;
+    current.severitySum += Number(row.severityScore || 0);
+    current.maxAqi = Math.max(current.maxAqi, Number(row.aqi || 0));
+    aqiGrouped.set(key, current);
+  }
+
+  const aggregatedWeatherRows = Array.from(weatherGrouped.values()).map((item) => ({
+    _id: item._id,
+    avgWeatherSeverityScore: item.count ? item.severitySum / item.count : 0,
+    maxRainMm: item.maxRainMm,
+    maxHeatRisk: item.maxHeatRisk,
+    maxStormRisk: item.maxStormRisk
+  }));
+
+  const aggregatedAqiRows = Array.from(aqiGrouped.values()).map((item) => ({
+    _id: item._id,
+    avgAqiSeverityScore: item.count ? item.severitySum / item.count : 0,
+    maxAqi: item.maxAqi
+  }));
+
+  const aqiMap = new Map(aggregatedAqiRows.map((row) => [`${row._id.city}|${row._id.state}`, row]));
   const incidents = [];
 
-  for (const weather of weatherRows) {
+  for (const weather of aggregatedWeatherRows) {
     const key = `${weather._id.city}|${weather._id.state}`;
     const aqi = aqiMap.get(key);
     const disruptionScore = Number((

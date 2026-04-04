@@ -1,12 +1,12 @@
 const User = require("../../models/User");
 const LinkedWorker = require("../../models/LinkedWorker");
-const ExternalDeliveryDriver = require("../../models/ExternalDeliveryDriver");
 const { ApiError } = require("../../utils/ApiError");
+const { getDriverByPlatformId } = require("../../services/mockApiClient");
 
 async function findExternalWorker(platformName, platformDriverId) {
-  const worker = await ExternalDeliveryDriver.findOne({ platformName, platformDriverId }).lean();
+  const worker = await getDriverByPlatformId(platformName, platformDriverId);
   if (!worker) {
-    throw new ApiError(404, "Worker not found in operational data");
+    throw new ApiError(404, "Worker not found in mock operational api");
   }
   return worker;
 }

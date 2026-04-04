@@ -8,7 +8,7 @@ setTestEnv();
 test("linkWorkerToUser links operational worker to user", async () => {
   const User = freshRequire("models/User.js");
   const LinkedWorker = freshRequire("models/LinkedWorker.js");
-  const ExternalDeliveryDriver = freshRequire("models/ExternalDeliveryDriver.js");
+  const mockApiClient = freshRequire("services/mockApiClient.js");
   const workersService = freshRequire("modules/workers/workers.service.js");
 
   const mutableUser = { ...userFixture, linkedWorkers: [], linkedWorkerId: null, async save() { return this; } };
@@ -20,17 +20,15 @@ test("linkWorkerToUser links operational worker to user", async () => {
     findOne: async () => null,
     findOneAndUpdate: async () => ({ ...linkedWorkerFixture })
   });
-  const restoreExternal = stubMethods(ExternalDeliveryDriver, {
-    findOne: () => ({
-      lean: async () => ({
-        platformName: "swiggy",
-        platformDriverId: "SWIGGY-DEL-00000145",
-        city: "Delhi",
-        state: "Delhi",
-        cityTier: "tier1",
-        joinedAt: new Date("2026-01-01T00:00:00.000Z"),
-        driverProfile: { archetype: "full_time" }
-      })
+  const restoreExternal = stubMethods(mockApiClient, {
+    getDriverByPlatformId: async () => ({
+      platformName: "swiggy",
+      platformDriverId: "SWIGGY-DEL-00000145",
+      city: "Delhi",
+      state: "Delhi",
+      cityTier: "tier1",
+      joinedAt: new Date("2026-01-01T00:00:00.000Z"),
+      driverProfile: { archetype: "full_time" }
     })
   });
 

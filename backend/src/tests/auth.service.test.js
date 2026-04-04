@@ -7,6 +7,10 @@ setTestEnv();
 
 test("signup hashes password and returns token", async () => {
   const User = freshRequire("models/User.js");
+  const workersService = freshRequire("modules/workers/workers.service.js");
+  const restoreWorkers = stubMethods(workersService, {
+    linkWorkerToUser: async () => ({ _id: "worker-link-1" })
+  });
   const authService = freshRequire("modules/auth/auth.service.js");
   const restore = stubMethods(User, {
     findOne: async () => null,
@@ -14,13 +18,19 @@ test("signup hashes password and returns token", async () => {
   });
 
   try {
-    const result = await authService.signup({ email: "rider@example.com", password: "secret123" });
+    const result = await authService.signup({
+      email: "rider@example.com",
+      password: "secret123",
+      platformName: "swiggy",
+      platformDriverId: "SWIGGY-DEL-00000145"
+    });
     assert.equal(result.user.email, "rider@example.com");
     assert.ok(result.user.passwordHash);
     assert.notEqual(result.user.passwordHash, "secret123");
     assert.ok(result.accessToken);
   } finally {
     restore();
+    restoreWorkers();
   }
 });
 

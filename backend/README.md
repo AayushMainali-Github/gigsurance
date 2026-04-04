@@ -14,7 +14,7 @@ This service is the system of record for:
 - scheduler state and audit logs
 
 It depends on:
-- `mock/` for operational worker, weather, and AQI data
+- `mock-api/` for operational worker, weather, and AQI data
 - `ml/` for premium and payout recommendations
 
 ## Stack
@@ -40,6 +40,7 @@ MONGO_URI=
 DB_NAME=
 JWT_SECRET=
 JWT_EXPIRES_IN=7d
+MOCK_API_BASE_URL=http://127.0.0.1:4000
 ML_API_BASE_URL=http://127.0.0.1:8000
 ENABLE_SCHEDULER=true
 JOB_LOCK_STALE_MS=900000
@@ -97,12 +98,14 @@ backend/
 - `mlClient.js`
   - wraps ML quote and payout endpoints
   - retries, timeouts, normalized DTOs, fallback envelopes
+- `mockApiClient.js`
+  - wraps mock-api delivery, weather, and AQI reads
 - `weeklyPremiumService.js`
   - Monday pricing workflow
 - `dailyPayoutService.js`
   - daily payout workflow
 - `incidentDetectionService.js`
-  - derives payout incident windows from operational weather/AQI data
+  - derives payout incident windows from mock-api weather/AQI snapshots
 - `ledgerService.js`
   - idempotent ledger writes and finance aggregations
 - `riskReviewService.js`
@@ -124,6 +127,7 @@ backend/
 ### Auth
 
 - `POST /api/auth/signup`
+  - requires `email`, `password`, `platformName`, `platformDriverId`
 - `POST /api/auth/login`
 - `POST /api/auth/refresh`
 - `POST /api/auth/logout`
@@ -135,6 +139,7 @@ backend/
 ### Workers
 
 - `POST /api/workers/link`
+  - validates worker existence through mock-api
 - `GET /api/workers`
 - `GET /api/workers/primary`
 
@@ -264,6 +269,8 @@ Finance summaries expose:
 ## Tests
 
 The test suite is written with built-in `node:test` and fixture-driven stubs.
+
+Operational data tests should stub `mockApiClient.js`, not direct collection models.
 
 Coverage includes:
 - auth service
