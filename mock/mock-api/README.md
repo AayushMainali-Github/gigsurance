@@ -24,6 +24,15 @@ npm run dev
 
 Server starts on `http://localhost:4000` by default.
 
+## CORS
+
+The API sends permissive CORS headers for local and dev consumers:
+
+- `Access-Control-Allow-Origin: *`
+- `Access-Control-Allow-Methods: GET, HEAD, OPTIONS`
+
+That allows `mock-monitor` or any other frontend running on a different local origin such as `http://localhost:5173` to call the API directly.
+
 ## Endpoints
 
 ### Health
