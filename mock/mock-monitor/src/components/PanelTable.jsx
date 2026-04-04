@@ -15,7 +15,7 @@ import {
   UserRound,
   Wind
 } from 'lucide-react';
-import { formatLabel } from '../lib/utils/format';
+import { formatDisplayValue, formatLabel } from '../lib/utils/format';
 
 function getPanelIcon(title) {
   const normalized = String(title || '').toLowerCase();
@@ -74,7 +74,7 @@ function renderMetricChip(label, value) {
   return (
     <span className={`metric-chip metric-chip-${tone}`}>
       <Icon size={14} strokeWidth={2} />
-      <span>{String(value == null ? '-' : value)}</span>
+      <span>{formatDisplayValue(value)}</span>
     </span>
   );
 }
@@ -86,6 +86,7 @@ function renderCell(column, value) {
   const normalizedLabel = String(label || '').toLowerCase();
   const Icon = getCellIcon(label);
   const stringValue = value == null ? '-' : String(value);
+  const displayValue = formatDisplayValue(stringValue);
 
   if (normalizedLabel.includes('tier')) return renderTierBadge(stringValue);
   if (normalizedLabel.includes('category')) return renderCategoryBadge(stringValue);
@@ -97,7 +98,7 @@ function renderCell(column, value) {
     return (
       <span className="cell-identity">
         <Icon size={14} strokeWidth={2} />
-        <span>{stringValue}</span>
+        <span>{displayValue}</span>
       </span>
     );
   }
@@ -106,7 +107,7 @@ function renderCell(column, value) {
     return <span className="cell-numeric">{stringValue}</span>;
   }
 
-  return <span className="cell-secondary">{stringValue}</span>;
+  return <span className="cell-secondary">{displayValue}</span>;
 }
 
 export function PanelTable({ title, caption, columns, rows, rowKey }) {

@@ -6,8 +6,7 @@ import { api } from '../../lib/api/client';
 import { cityMeta } from '../../lib/cityMeta';
 import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
-import { formatNumber } from '../../lib/utils/format';
-import { formatLabel } from '../../lib/utils/format';
+import { formatDisplayValue, formatLabel, formatNumber } from '../../lib/utils/format';
 import { useMonitorFilters } from '../../store/filters';
 
 function enrichCity(cities, weather, aqi, liveBreakdown, disruptionRows) {
@@ -140,7 +139,7 @@ export function MapsPage() {
         </div>
         <div className="hero-side">
           <div><span>Mapped Cities</span><strong>{formatNumber(mappedCities.length)}</strong></div>
-          <div><span>Current Mode</span><strong>{modeLabel}</strong></div>
+          <div><span>Current Mode</span><strong>{formatDisplayValue(modeLabel)}</strong></div>
         </div>
       </section>
       <section className="metric-grid">
@@ -186,8 +185,8 @@ export function MapsPage() {
                   >
                     <Popup>
                       <div className="map-popup">
-                        <strong>{city.city}</strong>
-                        <span className="map-popup-subtitle">{city.state}</span>
+                        <strong>{formatDisplayValue(city.city)}</strong>
+                        <span className="map-popup-subtitle">{formatDisplayValue(city.state)}</span>
                         <div className="map-popup-grid">
                           <div className="map-popup-item">
                             <span>Drivers</span>

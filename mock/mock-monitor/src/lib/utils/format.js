@@ -8,5 +8,22 @@ export function formatLabel(value) {
   if (!normalized) return 'All';
   return normalized
     .replace(/tier\s*(\d+)/gi, 'Tier $1')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .replace(/\bAqi\b/g, 'AQI')
+    .replace(/\bApi\b/g, 'API')
+    .replace(/\bId\b/g, 'ID')
+    .replace(/\bMm\b/g, 'MM');
+}
+
+export function formatDisplayValue(value) {
+  if (value == null) return '-';
+  if (typeof value === 'number') return String(value);
+
+  const normalized = String(value).trim();
+  if (!normalized) return '-';
+
+  if (/^-?\d+(\.\d+)?$/.test(normalized)) return normalized;
+
+  return formatLabel(normalized);
 }

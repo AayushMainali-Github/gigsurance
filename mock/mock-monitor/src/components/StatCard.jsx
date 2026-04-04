@@ -13,6 +13,7 @@ import {
   Users,
   Wind
 } from 'lucide-react';
+import { formatDisplayValue } from '../lib/utils/format';
 
 const iconMap = [
   { match: ['driver', 'user'], icon: Users, badge: 'indigo' },
@@ -40,6 +41,8 @@ function getCardPresentation(title, tone) {
 
 export function StatCard({ title, value, subtitle, tone = 'default' }) {
   const { icon: Icon, badge } = getCardPresentation(title, tone);
+  const displayValue = typeof value === 'string' ? formatDisplayValue(value) : value;
+  const displaySubtitle = typeof subtitle === 'string' ? formatDisplayValue(subtitle) : subtitle;
 
   return (
     <article className={`stat-card card tone-${tone}`}>
@@ -48,9 +51,9 @@ export function StatCard({ title, value, subtitle, tone = 'default' }) {
       </div>
       <div className="stat-copy">
         <span className="stat-title">{title}</span>
-        <strong className="stat-value">{value}</strong>
+        <strong className="stat-value">{displayValue}</strong>
       </div>
-      {subtitle ? <span className="stat-subtitle">{subtitle}</span> : null}
+      {subtitle ? <span className="stat-subtitle">{displaySubtitle}</span> : null}
     </article>
   );
 }

@@ -1,3 +1,4 @@
+import { formatDisplayValue } from '../../lib/utils/format';
 import { Building2, MapPin, RotateCcw } from 'lucide-react';
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -47,7 +48,7 @@ export function FilterBar() {
         <select value={city} onChange={(event) => updateFilter('city', event.target.value)}>
           <option value="">All cities</option>
           {cities.map((item) => (
-            <option key={item.city} value={item.city}>{item.city}</option>
+            <option key={item.city} value={item.city}>{formatDisplayValue(item.city)}</option>
           ))}
         </select>
       </div>
@@ -56,7 +57,7 @@ export function FilterBar() {
         <select value={platformName} onChange={(event) => updateFilter('platformName', event.target.value)}>
           <option value="">All platforms</option>
           {platforms.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item} value={item}>{formatDisplayValue(item)}</option>
           ))}
         </select>
       </div>
@@ -65,7 +66,7 @@ export function FilterBar() {
         <select value={state} onChange={(event) => updateFilter('state', event.target.value)}>
           <option value="">All states</option>
           {states.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item} value={item}>{formatDisplayValue(item)}</option>
           ))}
         </select>
       </div>

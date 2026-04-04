@@ -369,10 +369,18 @@ button, select { font: inherit; }
 .panel-scroll-body::-webkit-scrollbar-track { background: transparent; }
 
 .table-wrap {
+  position: relative;
+  isolation: isolate;
   overflow: auto;
   max-height: calc(44px + (4 * 49px));
+  background: var(--surface);
 }
 table, .panel-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
 thead th {
   background: rgba(37, 99, 235, 0.04);
   font-size: 0.7rem;
@@ -383,7 +391,9 @@ thead th {
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 3;
+  background-clip: padding-box;
+  box-shadow: 0 1px 0 var(--border-color);
 }
 th, td { text-align: left; padding: 12px 10px; }
 tbody td {

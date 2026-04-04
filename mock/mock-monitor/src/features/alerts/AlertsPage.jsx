@@ -4,8 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, Bell, Cloud, Truck, Wind } from 'lucide-react';
 import { api } from '../../lib/api/client';
 import { useMonitorFilters } from '../../store/filters';
-import { formatNumber } from '../../lib/utils/format';
-import { formatLabel } from '../../lib/utils/format';
+import { formatDisplayValue, formatLabel, formatNumber } from '../../lib/utils/format';
 import { StatCard } from '../../components/StatCard';
 import { PanelTable } from '../../components/PanelTable';
 import { SparkBarList } from '../../components/SparkBarList';
@@ -209,8 +208,8 @@ export function AlertsPage() {
           <p>The current alert stack is synthesized from live order pressure, latest weather state, and latest AQI state for the selected scope.</p>
         </div>
         <div className="hero-side">
-          <div><span>Scope</span><strong>{city || state || 'Network'}</strong></div>
-          <div><span>Platform</span><strong>{platformName || 'All'}</strong></div>
+          <div><span>Scope</span><strong>{formatDisplayValue(city || state || 'Network')}</strong></div>
+          <div><span>Platform</span><strong>{formatDisplayValue(platformName || 'All')}</strong></div>
         </div>
       </section>
 
