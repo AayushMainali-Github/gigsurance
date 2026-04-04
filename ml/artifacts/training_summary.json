@@ -1,0 +1,53 @@
+{
+  "mongo_uri": "mongodb://localhost:27017",
+  "db_name": "gigsurance",
+  "artifact_dir": "D:\\gigsurance\\ml\\artifacts",
+  "weekly_rows": 498591,
+  "city_day_rows": 36600,
+  "environment_forecast": {
+    "model_family": "xgboost_regressor",
+    "rows_train": 29200,
+    "rows_test": 7300,
+    "targets": {
+      "next_disruption_score": {
+        "mae": 0.03549556828112564,
+        "median_ae": 0.02846315475702285,
+        "rmse": 0.04574832478978974,
+        "mean_prediction": 0.21254931390285492
+      },
+      "next_max_aqi": {
+        "mae": 40.45947431590459,
+        "median_ae": 25.067909240722656,
+        "rmse": 62.48526628382126,
+        "mean_prediction": 152.69839477539062
+      },
+      "next_max_rain_mm": {
+        "mae": 2.7507473121277273,
+        "median_ae": 2.264384651184082,
+        "rmse": 3.465650956979368,
+        "mean_prediction": 6.313297748565674
+      },
+      "next_max_heat_risk": {
+        "mae": 0.07591945456023728,
+        "median_ae": 0.055281282067298904,
+        "rmse": 0.10845258466922679,
+        "mean_prediction": 0.2237074226140976
+      }
+    }
+  },
+  "earnings_forecast": {
+    "model_family": "xgboost_regressor",
+    "rows_train": 366665,
+    "rows_test": 91928,
+    "metrics": {
+      "mae": 254.70044026799155,
+      "median_ae": 173.06609619140636,
+      "rmse": 353.68215349628065,
+      "mean_prediction": 1077.4754638671875
+    }
+  },
+  "premium_engine": {
+    "pricing_basis": "Trailing 12-week baseline + next 7-day environment forecast",
+    "artifact": "premium_spec.json"
+  }
+}

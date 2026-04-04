@@ -1,0 +1,19 @@
+{
+  "pricing_logic": "Premium = Base Rate x (1 + ARIA_structural) x (1 + 0.5 x ARIA_environmental) x FEPS_multiplier - Weather Resilience Dividend.",
+  "signature_index": "ARIA = Adaptive Recovery Income Architecture",
+  "aria_structural": "0.30*ERL + 0.20*(1-IFAS) + 0.20*SWEC + 0.15*BISI_risk + 0.15*PCR",
+  "aria_environmental": "0.40*(1-CRV) + 0.35*SRPL + 0.25*FEPS",
+  "core_components": [
+    "ERL = Earnings Recovery Half-Life",
+    "IFAS = Income Floor Adequacy Score",
+    "BISI = Baseline Income Stability Index risk loading",
+    "SWEC = Severe Weather Earning Concentration",
+    "PCR = Platform Concentration Ratio proxy",
+    "CRV = City Rebound Velocity",
+    "SRPL = Seasonal Risk Phase Loading",
+    "FEPS = Forecast Event Pressure Score",
+    "Severe Rain Loading",
+    "Weather Resilience Dividend"
+  ],
+  "coverage_logic": "Coverage grows with baseline income, forecast event pressure, and ARIA-driven fragility under disruption."
+}

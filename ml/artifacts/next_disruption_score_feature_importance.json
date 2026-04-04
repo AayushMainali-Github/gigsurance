@@ -1,0 +1,104 @@
+{
+  "top_features": [
+    {
+      "feature": "combined_disruption_score_rollmean_7",
+      "weight": 0.29992932081222534
+    },
+    {
+      "feature": "combined_disruption_score_rollmean_3",
+      "weight": 0.04787551611661911
+    },
+    {
+      "feature": "dayofyear",
+      "weight": 0.013627179898321629
+    },
+    {
+      "feature": "weekofyear",
+      "weight": 0.013346184976398945
+    },
+    {
+      "feature": "state_Uttar Pradesh",
+      "weight": 0.013011889532208443
+    },
+    {
+      "feature": "max_heat_risk_rollmean_3",
+      "weight": 0.012625680305063725
+    },
+    {
+      "feature": "state_West Bengal",
+      "weight": 0.012275653891265392
+    },
+    {
+      "feature": "state_Tamil Nadu",
+      "weight": 0.010447569191455841
+    },
+    {
+      "feature": "state_Karnataka",
+      "weight": 0.009272378869354725
+    },
+    {
+      "feature": "city_Gorakhpur",
+      "weight": 0.00916907750070095
+    },
+    {
+      "feature": "state_Gujarat",
+      "weight": 0.00904726330190897
+    },
+    {
+      "feature": "state_Maharashtra",
+      "weight": 0.008742540143430233
+    },
+    {
+      "feature": "combined_disruption_score_lag_1",
+      "weight": 0.0084601528942585
+    },
+    {
+      "feature": "city_Loni",
+      "weight": 0.008121713064610958
+    },
+    {
+      "feature": "month",
+      "weight": 0.0075795017182827
+    },
+    {
+      "feature": "city_Delhi",
+      "weight": 0.007472645491361618
+    },
+    {
+      "feature": "state_Rajasthan",
+      "weight": 0.007229721639305353
+    },
+    {
+      "feature": "state_Uttarakhand",
+      "weight": 0.00720621645450592
+    },
+    {
+      "feature": "city_Nanded",
+      "weight": 0.006842795759439468
+    },
+    {
+      "feature": "city_Durgapur",
+      "weight": 0.006751746870577335
+    },
+    {
+      "feature": "state_Delhi",
+      "weight": 0.006722516845911741
+    },
+    {
+      "feature": "combined_disruption_score_lag_14",
+      "weight": 0.006631886586546898
+    },
+    {
+      "feature": "state_Jammu and Kashmir",
+      "weight": 0.006586558651179075
+    },
+    {
+      "feature": "city_Gaya",
+      "weight": 0.006460994947701693
+    },
+    {
+      "feature": "city_Jhansi",
+      "weight": 0.006450188346207142
+    }
+  ]
+}
