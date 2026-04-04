@@ -124,7 +124,7 @@ export function PanelTable({ title, caption, columns, rows, rowKey }) {
         </div>
         <span className="panel-meta">{rows.length} rows</span>
       </div>
-      <div className="table-wrap">
+      <div className="table-wrap panel-scroll-body">
         <table className="panel-table">
           <thead>
             <tr>

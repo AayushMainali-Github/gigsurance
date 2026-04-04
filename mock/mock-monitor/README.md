@@ -2,6 +2,8 @@
 
 React operations dashboard for the India gig-worker insurance mock system.
 
+UI documentation for the current redesign is available in [UI_DOCUMENTATION.md](/C:/Users/prabi/Documents/GuideWire/Code/gigsurance/mock/mock-monitor/UI_DOCUMENTATION.md).
+
 `mock-monitor` sits on top of `mock-api` and provides a browser-based monitoring surface for:
 
 - delivery operations

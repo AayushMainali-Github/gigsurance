@@ -27,7 +27,7 @@ export function SparkBarList({ title, items, valueKey, labelKey, formatter = (va
         </div>
         <span className="panel-meta">{items.length} items</span>
       </div>
-      <div className="bar-list">
+      <div className="bar-list panel-scroll-body panel-scroll-body-bars">
         {items.length ? items.map((item) => {
           const value = Number(item[valueKey] || 0);
           const width = Math.max(6, (value / maxValue) * 100);
