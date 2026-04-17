@@ -10,6 +10,7 @@ import { ScreenShell } from '../components/ScreenShell';
 import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
 import { buildDashboardViewModel } from '../features/dashboard/dashboardState';
+import { buildJourneyChecklist } from '../features/hardening/journeyState';
 import { useAuth } from '../features/auth/AuthContext';
 import { api, getErrorMessage, isUnauthorizedError } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
@@ -33,6 +34,13 @@ export function HomeScreen() {
   const currentPremium = dashboard.currentPremium || null;
   const latestPayout = dashboard.latestPayout || null;
   const viewModel = buildDashboardViewModel({
+    coverage,
+    currentPremium,
+    latestPayout,
+    reviewSummary: dashboard.reviewSummary
+  });
+  const journeyChecklist = buildJourneyChecklist({
+    user,
     coverage,
     currentPremium,
     latestPayout,
@@ -149,6 +157,17 @@ export function HomeScreen() {
             tone={getStatusTone(latestPayout?.status)}
             badgeLabel={formatStatusLabel(latestPayout?.status || 'empty')}
           />
+          <SectionTitle eyebrow="MVP Hardening" title="Seeded Journey Check" meta="Use this to validate the worker journey against real seeded flows." />
+          {journeyChecklist.map((item) => (
+            <DataListItem
+              key={item.key}
+              label={item.label}
+              value={item.complete ? 'Complete' : 'Missing'}
+              meta={item.detail}
+              tone={item.complete ? 'success' : 'warning'}
+              badgeLabel={item.complete ? 'Ready' : 'Check'}
+            />
+          ))}
         </View>
       ) : (
         <EmptyState

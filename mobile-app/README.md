@@ -127,3 +127,4 @@ The mobile app intentionally excludes these because the backend does not expose 
 - speculative offline sync flows
 
 See [docs/ARCHITECTURE.md](C:/Users/prabi/Documents/Project/gigsurance/mobile-app/docs/ARCHITECTURE.md) for the fuller runbook and handoff documentation.
+For seeded-flow validation before feature expansion, also use [docs/MVP_HARDENING.md](C:/Users/prabi/Documents/Project/gigsurance/mobile-app/docs/MVP_HARDENING.md).

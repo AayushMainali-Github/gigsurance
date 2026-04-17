@@ -35,6 +35,10 @@ export function LoginScreen({ navigation }) {
     >
       <View style={{ gap: theme.spacing.lg }}>
         <NoticeStrip tone="info" text={message} />
+        <NoticeStrip
+          tone="warning"
+          text="For seeded local validation, use a historical seed account from backend seeding with password SeededUser!123."
+        />
         <View style={styles.form}>
           <Text style={styles.label}>Email</Text>
           <TextInput
