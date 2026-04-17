@@ -3,6 +3,7 @@ import { AppTabs } from './AppTabs';
 import { LoadingState } from '../components/LoadingState';
 import { useAuth } from '../features/auth/AuthContext';
 import { LoginScreen } from '../screens/LoginScreen';
+import { PolicyEnrollScreen } from '../screens/PolicyEnrollScreen';
 import { SignupScreen } from '../screens/SignupScreen';
 import { WorkerLinkScreen } from '../screens/WorkerLinkScreen';
 
@@ -16,6 +17,7 @@ export function RootNavigator() {
   }
 
   const needsWorkerLink = isAuthenticated && !user?.linkedWorker;
+  const needsPolicyEnrollment = isAuthenticated && user?.linkedWorker && !user?.currentPolicy;
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -26,6 +28,8 @@ export function RootNavigator() {
         </>
       ) : needsWorkerLink ? (
         <Stack.Screen name="WorkerLink" component={WorkerLinkScreen} />
+      ) : needsPolicyEnrollment ? (
+        <Stack.Screen name="PolicyEnroll" component={PolicyEnrollScreen} />
       ) : (
         <Stack.Screen name="AppTabs" component={AppTabs} />
       )}

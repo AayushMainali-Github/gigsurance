@@ -101,6 +101,10 @@ export function AuthProvider({ children }) {
         await api.workers.link(payload);
         return refreshUserState();
       },
+      async enrollPolicy() {
+        await api.policies.enroll();
+        return refreshUserState();
+      },
       async logout() {
         try {
           await api.auth.logout();
