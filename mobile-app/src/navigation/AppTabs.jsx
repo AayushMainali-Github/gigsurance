@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeScreen } from '../screens/HomeScreen';
 import { CoverageScreen } from '../screens/CoverageScreen';
+import { PremiumsScreen } from '../screens/PremiumsScreen';
 import { PayoutsScreen } from '../screens/PayoutsScreen';
 import { ActivityScreen } from '../screens/ActivityScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
@@ -22,6 +23,7 @@ export function AppTabs() {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Coverage" component={CoverageScreen} />
+      <Tab.Screen name="Premiums" component={PremiumsScreen} />
       <Tab.Screen name="Payouts" component={PayoutsScreen} />
       <Tab.Screen name="Activity" component={ActivityScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />

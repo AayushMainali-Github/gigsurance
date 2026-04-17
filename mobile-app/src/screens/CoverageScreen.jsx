@@ -1,3 +1,6 @@
+import { useQuery } from '@tanstack/react-query';
+import { DataListItem } from '../components/DataListItem';
+import { EmptyState } from '../components/EmptyState';
 import { InfoPanel } from '../components/InfoPanel';
 import { LoadingState } from '../components/LoadingState';
 import { NoticeStrip } from '../components/NoticeStrip';
@@ -5,36 +8,118 @@ import { ScreenShell } from '../components/ScreenShell';
 import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
 import { View } from 'react-native';
+import { useAuth } from '../features/auth/AuthContext';
+import { api } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
 
 export function CoverageScreen() {
+  const { user } = useAuth();
+  const currentPolicyQuery = useQuery({
+    queryKey: ['policy-current'],
+    queryFn: () => api.policies.getCurrent()
+  });
+  const coverageQuery = useQuery({
+    queryKey: ['policy-coverage'],
+    queryFn: () => api.policies.getCoverage()
+  });
+
+  if (currentPolicyQuery.isLoading || coverageQuery.isLoading) {
+    return (
+      <ScreenShell
+        eyebrow="Coverage"
+        title="Policy And Protection"
+        description="This screen explains your linked worker identity, policy posture, and current protection state."
+      >
+        <LoadingState label="Loading coverage details" />
+      </ScreenShell>
+    );
+  }
+
+  const currentPolicy = currentPolicyQuery.data?.data || user?.currentPolicy || null;
+  const coverage = coverageQuery.data?.data || null;
+  const linkedWorker = user?.linkedWorker || null;
+  const policyStatus = currentPolicy?.status || coverage?.status || 'unknown';
+  const startedAt = currentPolicy?.startedAt ? new Date(currentPolicy.startedAt).toLocaleDateString() : 'Not available';
+
   return (
     <ScreenShell
       eyebrow="Coverage"
       title="Policy And Protection"
-      description="This screen will hold linked worker identity, policy status, and weekly premium details."
+      description="This screen explains your policy posture in plain language using the current backend coverage and policy data."
     >
       <NoticeStrip
-        tone="success"
-        text="Coverage will remain worker-readable: active status, linked identity, policy summary, and premium context."
+        tone={policyStatus === 'active' ? 'success' : policyStatus === 'paused' ? 'warning' : 'info'}
+        text={`Your current policy is ${policyStatus}. This screen focuses on linked worker identity, policy state, and current protection context.`}
       />
-      <View style={{ gap: theme.spacing.lg }}>
-        <StatCard
-          eyebrow="Policy Status"
-          title="Coverage"
-          value="Ready"
-          note="Active, paused, and cancelled policy states will be rendered here in a worker-safe format."
-          tone="primary"
+
+      {currentPolicy || linkedWorker ? (
+        <>
+          <View style={{ gap: theme.spacing.lg }}>
+            <StatCard
+              eyebrow="Policy Status"
+              title={policyStatus}
+              value={policyStatus === 'active' ? 'Protection Active' : policyStatus}
+              note="Active, paused, and cancelled policy states are shown here in worker-safe language."
+              tone={policyStatus === 'active' ? 'success' : policyStatus === 'paused' ? 'warning' : 'info'}
+            />
+          </View>
+          <SectionTitle eyebrow="Coverage Details" title="Current Policy Posture" meta="Worker-facing summary of the current policy and linked worker state." />
+          <DataListItem
+            label="Linked Worker"
+            value={linkedWorker ? linkedWorker.platformDriverId : 'No linked worker'}
+            meta={
+              linkedWorker
+                ? `${linkedWorker.platformName} worker in ${linkedWorker.city}, ${linkedWorker.state}`
+                : 'You need a linked worker profile before coverage can function.'
+            }
+            tone={linkedWorker ? 'success' : 'warning'}
+            badgeLabel={linkedWorker?.enrollmentStatus || 'missing'}
+          />
+          <DataListItem
+            label="Policy Status"
+            value={policyStatus}
+            meta="This reflects the current backend policy state for your account."
+            tone={policyStatus === 'active' ? 'success' : policyStatus === 'paused' ? 'warning' : 'neutral'}
+            badgeLabel={policyStatus}
+          />
+          <DataListItem
+            label="Started Date"
+            value={startedAt}
+            meta="This is the start date of your current policy when available."
+            tone="accent"
+            badgeLabel="Started"
+          />
+          <DataListItem
+            label="Protection State"
+            value={coverage?.status === 'active' ? 'Protected this week' : 'Not fully active'}
+            meta="Protection state is driven by your current coverage status."
+            tone={coverage?.status === 'active' ? 'success' : 'warning'}
+            badgeLabel={coverage?.status || 'unknown'}
+          />
+          <DataListItem
+            label="No-Claim Weeks"
+            value={
+              currentPolicy?.noClaimWeeks !== undefined && currentPolicy?.noClaimWeeks !== null
+                ? String(currentPolicy.noClaimWeeks)
+                : 'Not available'
+            }
+            meta="This reflects the current no-claim count when available from the policy record."
+            tone="info"
+            badgeLabel="Policy Meta"
+          />
+          <InfoPanel
+            title="Coverage Summary"
+            body="This screen is intentionally focused on policy posture and worker protection state. It does not introduce unsupported claims workflows or operator actions."
+            tone="accent"
+            badgeLabel="Worker Safe"
+          />
+        </>
+      ) : (
+        <EmptyState
+          title="No coverage details available"
+          body="Coverage information will appear here once a worker is linked and a policy exists for the account."
         />
-      </View>
-      <SectionTitle eyebrow="Shared Primitive" title="Coverage Content Blocks" meta="Later backend data will sit inside reusable cards, notices, and list items." />
-      <InfoPanel
-        title="Planned scope"
-        body="Coverage state will be built on top of the existing worker, policy, billing, and payouts backend surfaces only."
-        tone="accent"
-        badgeLabel="Scope"
-      />
-      <LoadingState label="Coverage data wiring comes in the backend integration phase" />
+      )}
     </ScreenShell>
   );
 }
