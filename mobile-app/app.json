@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "GIGSurance",
+    "slug": "gigsurance-mobile-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.gigsurance.mobileapp"
+    },
+    "extra": {
+      "apiBaseUrl": "http://127.0.0.1:5000"
+    }
+  }
+}
