@@ -1,20 +1,9 @@
 import Constants from 'expo-constants';
+import { ApiError, getErrorMessage, isUnauthorizedError, isUnavailableError } from './errors';
 import { getAccessToken } from '../storage/session';
 
 const DEFAULT_TIMEOUT_MS = 15000;
 const API_BASE_URL = Constants.expoConfig?.extra?.apiBaseUrl || 'http://127.0.0.1:5000';
-
-export class ApiError extends Error {
-  constructor(message, options = {}) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = options.status ?? null;
-    this.code = options.code ?? 'api_error';
-    this.payload = options.payload ?? null;
-    this.path = options.path ?? null;
-    this.retryable = options.retryable ?? false;
-  }
-}
 
 function buildUrl(path, query) {
   const url = new URL(path, API_BASE_URL);
@@ -188,18 +177,4 @@ export const api = {
   }
 };
 
-export function isUnavailableError(error) {
-  return error instanceof ApiError && ['not_found', 'network_unavailable', 'request_timeout'].includes(error.code);
-}
-
-export function isUnauthorizedError(error) {
-  return error instanceof ApiError && error.status === 401;
-}
-
-export function getErrorMessage(error, fallback = 'Something went wrong') {
-  if (error instanceof ApiError) {
-    return error.message;
-  }
-
-  return fallback;
-}
+export { ApiError, getErrorMessage, isUnauthorizedError, isUnavailableError };

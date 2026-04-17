@@ -5,13 +5,14 @@ import { NoticeStrip } from '../components/NoticeStrip';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ScreenShell } from '../components/ScreenShell';
 import { StatusBadge } from '../components/StatusBadge';
+import { getWorkerLinkFeedback } from '../features/workers/linkingState';
 import { theme } from '../lib/theme/theme';
 import { useAuth } from '../features/auth/AuthContext';
 
 const platformOptions = ['swiggy', 'zomato'];
 
 export function WorkerLinkScreen() {
-  const { linkWorker, getErrorMessage } = useAuth();
+  const { linkWorker } = useAuth();
   const [platformName, setPlatformName] = useState('swiggy');
   const [platformDriverId, setPlatformDriverId] = useState('');
   const [status, setStatus] = useState({ tone: 'info', message: 'Link your worker identity to continue into coverage.' });
@@ -28,17 +29,7 @@ export function WorkerLinkScreen() {
       });
       setStatus({ tone: 'success', message: 'Worker found and linked successfully.' });
     } catch (error) {
-      const message = getErrorMessage(error, 'Unable to link worker right now.');
-
-      if (error?.status === 404) {
-        setStatus({ tone: 'warning', message: 'Worker not found in the mock operational API. Check platform and driver ID.' });
-      } else if (error?.status === 409 && /another user/i.test(message)) {
-        setStatus({ tone: 'danger', message: 'This worker is already linked to another account.' });
-      } else if (error?.status === 409) {
-        setStatus({ tone: 'warning', message: 'A primary worker is already linked to this account.' });
-      } else {
-        setStatus({ tone: 'danger', message });
-      }
+      setStatus(getWorkerLinkFeedback(error));
     } finally {
       setSubmitting(false);
     }

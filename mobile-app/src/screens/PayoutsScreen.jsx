@@ -9,6 +9,7 @@ import { NoticeStrip } from '../components/NoticeStrip';
 import { ScreenShell } from '../components/ScreenShell';
 import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
+import { buildPayoutListViewModel } from '../features/payouts/payoutState';
 import { api, getErrorMessage, isUnauthorizedError } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
 import {
@@ -106,6 +107,7 @@ export function PayoutsScreen() {
   const payoutBundle = payoutsQuery.data?.data || { decisions: [], transactions: [] };
   const latestPayout = latestPayoutQuery.data?.data || null;
   const decisions = payoutBundle.decisions || [];
+  const decisionRows = buildPayoutListViewModel(decisions);
   const transactions = payoutBundle.transactions || [];
   const latestTransaction = latestPayout
     ? transactions.find((item) => item.payoutDecisionId === latestPayout.id) || null
@@ -189,19 +191,15 @@ export function PayoutsScreen() {
 
       <View style={{ gap: theme.spacing.md }}>
         <SectionTitle eyebrow="Recent Decisions" title="Payout History" meta="Latest payout decisions for this worker account." />
-        {decisions.length ? (
-          decisions.map((item) => (
+        {decisionRows.length ? (
+          decisionRows.map((item) => (
             <DataListItem
               key={item.id}
-              label={formatIncidentDate(item.incidentDate)}
-              value={formatCurrencyInr(item.finalPayoutInr)}
-              meta={
-                item.manualReviewFlag || item.riskReviewFlag
-                  ? 'Review-aware payout decision.'
-                  : `Status: ${formatStatusLabel(item.status || 'unknown')}`
-              }
-              tone={getPayoutTone(item.status)}
-              badgeLabel={formatStatusLabel(item.status || 'unknown')}
+              label={item.label}
+              value={item.value}
+              meta={item.meta}
+              tone={item.tone}
+              badgeLabel={item.badgeLabel}
             />
           ))
         ) : (
