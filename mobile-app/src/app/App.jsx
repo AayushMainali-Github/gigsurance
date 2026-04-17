@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { RootNavigator } from '../navigation/RootNavigator';
 import { theme } from '../lib/theme/theme';
+import { AuthProvider } from '../features/auth/AuthContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,10 +30,12 @@ export function App() {
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
-        <NavigationContainer theme={navigationTheme}>
-          <StatusBar style="dark" />
-          <RootNavigator />
-        </NavigationContainer>
+        <AuthProvider>
+          <NavigationContainer theme={navigationTheme}>
+            <StatusBar style="dark" />
+            <RootNavigator />
+          </NavigationContainer>
+        </AuthProvider>
       </QueryClientProvider>
     </SafeAreaProvider>
   );
