@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.lg
   },
   header: {
-    marginBottom: theme.spacing.xl,
+    marginBottom: theme.spacing.xxl,
     gap: theme.spacing.sm
   },
   eyebrow: {

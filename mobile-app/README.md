@@ -24,6 +24,24 @@ It does not include admin dashboards, monitoring surfaces, finance ops, or fraud
 - Expo Secure Store
 - Async Storage
 
+## Design Direction
+
+The mobile app inherits its visual language from `mock/mock-monitor/UI_DOCUMENTATION.md`, adapted for phone-first use.
+
+Preserved rules:
+
+- light neutral page backgrounds
+- white, sharp-edged panels
+- restrained semantic accents
+- strong text hierarchy
+- calm operational feel
+
+Intentionally not copied:
+
+- desktop sidebar layout
+- monitoring dashboard information architecture
+- dense operator-style tables as primary mobile patterns
+
 ## Local Development
 
 1. Install dependencies in `mobile-app`.

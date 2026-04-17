@@ -2,20 +2,21 @@ import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../lib/theme/theme';
 import { StatusBadge } from './StatusBadge';
 
-export function InfoPanel({ title, body, tone = 'neutral', badgeLabel }) {
+export function StatCard({ eyebrow, title, value, note, tone = 'primary' }) {
   return (
-    <View style={styles.panel}>
+    <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
-        {badgeLabel ? <StatusBadge tone={tone} label={badgeLabel} /> : null}
+        <Text style={styles.eyebrow}>{eyebrow}</Text>
+        <StatusBadge tone={tone} label={title} />
       </View>
-      <Text style={styles.body}>{body}</Text>
+      <Text style={styles.value}>{value}</Text>
+      {note ? <Text style={styles.note}>{note}</Text> : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  panel: {
+  card: {
     backgroundColor: theme.colors.surfacePrimary,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -26,11 +27,16 @@ const styles = StyleSheet.create({
   header: {
     gap: theme.spacing.sm
   },
-  title: {
-    color: theme.colors.textPrimary,
-    ...theme.typography.section
+  eyebrow: {
+    color: theme.colors.textMuted,
+    textTransform: 'uppercase',
+    ...theme.typography.eyebrow
   },
-  body: {
+  value: {
+    color: theme.colors.textPrimary,
+    ...theme.typography.metric
+  },
+  note: {
     color: theme.colors.textSecondary,
     lineHeight: 20,
     ...theme.typography.body
