@@ -19,34 +19,18 @@ import {
 
 export function HomeScreen() {
   const { user } = useAuth();
-  const coverageQuery = useQuery({
-    queryKey: ['policy-coverage'],
-    queryFn: () => api.policies.getCoverage()
-  });
-  const currentPremiumQuery = useQuery({
-    queryKey: ['billing-current'],
-    queryFn: () => api.billing.getCurrent()
-  });
-  const latestPayoutQuery = useQuery({
-    queryKey: ['payout-latest'],
-    queryFn: () => api.payouts.getLatest()
-  });
-  const reviewStatusQuery = useQuery({
-    queryKey: ['policy-review-status'],
-    queryFn: () => api.policies.getReviewStatus()
+  const dashboardQuery = useQuery({
+    queryKey: ['worker-dashboard'],
+    queryFn: () => api.users.getDashboard()
   });
 
-  const isLoading =
-    coverageQuery.isLoading ||
-    currentPremiumQuery.isLoading ||
-    latestPayoutQuery.isLoading ||
-    reviewStatusQuery.isLoading;
+  const isLoading = dashboardQuery.isLoading;
 
-  const coverage = coverageQuery.data?.data || null;
-  const currentPremium = currentPremiumQuery.data?.data || null;
-  const latestPayout = latestPayoutQuery.data?.data || null;
-  const reviewItems = reviewStatusQuery.data?.data || [];
-  const hasReviewHold = Boolean(reviewItems?.length || latestPayout?.status === 'held');
+  const dashboard = dashboardQuery.data?.data || {};
+  const coverage = dashboard.coverage || null;
+  const currentPremium = dashboard.currentPremium || null;
+  const latestPayout = dashboard.latestPayout || null;
+  const hasReviewHold = Boolean(dashboard.reviewSummary?.hasOpenReview || latestPayout?.status === 'held');
 
   if (isLoading) {
     return (

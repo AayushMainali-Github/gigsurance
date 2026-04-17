@@ -20,16 +20,12 @@ import {
 
 export function CoverageScreen() {
   const { user } = useAuth();
-  const currentPolicyQuery = useQuery({
-    queryKey: ['policy-current'],
-    queryFn: () => api.policies.getCurrent()
-  });
-  const coverageQuery = useQuery({
-    queryKey: ['policy-coverage'],
-    queryFn: () => api.policies.getCoverage()
+  const policySummaryQuery = useQuery({
+    queryKey: ['worker-policy-summary'],
+    queryFn: () => api.users.getPolicySummary()
   });
 
-  if (currentPolicyQuery.isLoading || coverageQuery.isLoading) {
+  if (policySummaryQuery.isLoading) {
     return (
       <ScreenShell
         eyebrow="Coverage"
@@ -41,9 +37,10 @@ export function CoverageScreen() {
     );
   }
 
-  const currentPolicy = currentPolicyQuery.data?.data || user?.currentPolicy || null;
-  const coverage = coverageQuery.data?.data || null;
-  const linkedWorker = user?.linkedWorker || null;
+  const policySummary = policySummaryQuery.data?.data || {};
+  const currentPolicy = policySummary.currentPolicy || user?.currentPolicy || null;
+  const coverage = policySummary.coverage || null;
+  const linkedWorker = policySummary.linkedWorker || user?.linkedWorker || null;
   const policyStatus = currentPolicy?.status || coverage?.status || 'unknown';
   const startedAt = currentPolicy?.startedAt ? new Date(currentPolicy.startedAt).toLocaleDateString() : 'Not available';
 

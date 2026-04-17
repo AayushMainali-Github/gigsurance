@@ -142,7 +142,9 @@ export const api = {
   },
 
   users: {
-    me: () => request('/api/users/me')
+    me: () => request('/api/users/me'),
+    getDashboard: () => request('/api/users/me/dashboard'),
+    getPolicySummary: () => request('/api/users/me/policy-summary')
   },
 
   workers: {
