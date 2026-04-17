@@ -10,6 +10,11 @@ import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
 import { api } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
+import {
+  formatCurrencyInr,
+  formatStatusLabel,
+  getStatusTone
+} from '../lib/utils/format';
 
 function formatIncidentDate(value) {
   if (!value) return 'Not available';
@@ -17,10 +22,7 @@ function formatIncidentDate(value) {
 }
 
 function getPayoutTone(status) {
-  if (status === 'approved') return 'success';
-  if (status === 'held') return 'warning';
-  if (status === 'failed' || status === 'not_eligible') return 'danger';
-  return 'neutral';
+  return getStatusTone(status);
 }
 
 function getTrustMessage(item) {
@@ -98,8 +100,8 @@ export function PayoutsScreen() {
           <View style={{ gap: theme.spacing.lg }}>
             <StatCard
               eyebrow="Latest Payout"
-              title={latestPayout.status || 'latest'}
-              value={`Rs ${latestPayout.finalPayoutInr ?? 0}`}
+              title={formatStatusLabel(latestPayout.status || 'latest')}
+              value={formatCurrencyInr(latestPayout.finalPayoutInr)}
               note={`Incident date: ${formatIncidentDate(latestPayout.incidentDate)}`}
               tone={tone === 'neutral' ? 'info' : tone}
             />
@@ -107,10 +109,10 @@ export function PayoutsScreen() {
           <SectionTitle eyebrow="Payout History" title="Readable Outcome States" meta="Worker-facing payout decisions and recent payout history." />
           <DataListItem
             label="Latest Payout Amount"
-            value={`Rs ${latestPayout.finalPayoutInr ?? 0}`}
+            value={formatCurrencyInr(latestPayout.finalPayoutInr)}
             meta="This amount reflects the latest backend payout decision for your account."
             tone={tone}
-            badgeLabel={latestPayout.status || 'latest'}
+            badgeLabel={formatStatusLabel(latestPayout.status || 'latest')}
           />
           <DataListItem
             label="Incident Date"
@@ -133,14 +135,14 @@ export function PayoutsScreen() {
           {latestTransaction ? (
             <DataListItem
               label="Transaction Status"
-              value={latestTransaction.status || 'Unknown'}
+              value={formatStatusLabel(latestTransaction.status || 'Unknown')}
               meta={
                 latestTransaction.referenceId
                   ? `Reference: ${latestTransaction.referenceId}`
                   : 'No payout reference is currently available.'
               }
               tone={getPayoutTone(latestTransaction.status)}
-              badgeLabel={latestTransaction.reconciliationState || 'unreconciled'}
+              badgeLabel={formatStatusLabel(latestTransaction.reconciliationState || 'unreconciled')}
             />
           ) : null}
           <InfoPanel
@@ -164,14 +166,14 @@ export function PayoutsScreen() {
             <DataListItem
               key={item.id}
               label={formatIncidentDate(item.incidentDate)}
-              value={`Rs ${item.finalPayoutInr ?? 0}`}
+              value={formatCurrencyInr(item.finalPayoutInr)}
               meta={
                 item.manualReviewFlag || item.riskReviewFlag
                   ? 'Review-aware payout decision.'
-                  : `Status: ${item.status || 'unknown'}`
+                  : `Status: ${formatStatusLabel(item.status || 'unknown')}`
               }
               tone={getPayoutTone(item.status)}
-              badgeLabel={item.status || 'unknown'}
+              badgeLabel={formatStatusLabel(item.status || 'unknown')}
             />
           ))
         ) : (

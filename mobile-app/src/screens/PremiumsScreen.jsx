@@ -10,6 +10,11 @@ import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
 import { api } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
+import {
+  formatCurrencyInr,
+  formatStatusLabel,
+  getStatusTone
+} from '../lib/utils/format';
 
 function formatWeekRange(currentPremium) {
   if (!currentPremium?.weekStart || !currentPremium?.weekEnd) {
@@ -66,18 +71,18 @@ export function PremiumsScreen() {
         <View style={{ gap: theme.spacing.lg }}>
           <StatCard
             eyebrow="Current Premium"
-            title={currentPremium.status || 'Current'}
-            value={`Rs ${currentPremium.finalPremiumInr ?? 0}`}
+            title={formatStatusLabel(currentPremium.status || 'Current')}
+            value={formatCurrencyInr(currentPremium.finalPremiumInr)}
             note={`Coverage week: ${formatWeekRange(currentPremium)}`}
             tone="primary"
           />
           <SectionTitle eyebrow="This Week" title="Premium Summary" meta="Backend-supported worker view of the current premium decision." />
           <DataListItem
             label="Current Premium"
-            value={`Rs ${currentPremium.finalPremiumInr ?? 0}`}
+            value={formatCurrencyInr(currentPremium.finalPremiumInr)}
             meta="Displayed in INR because the current backend reliably provides rupee-denominated output."
             tone="primary"
-            badgeLabel={currentPremium.status || 'quoted'}
+            badgeLabel={formatStatusLabel(currentPremium.status || 'quoted')}
           />
           <DataListItem
             label="Confidence"
@@ -122,10 +127,10 @@ export function PremiumsScreen() {
             <DataListItem
               key={item.id}
               label={formatWeekRange(item)}
-              value={`Rs ${item.finalPremiumInr ?? 0}`}
+              value={formatCurrencyInr(item.finalPremiumInr)}
               meta={item.confidenceBand ? `Confidence band: ${item.confidenceBand}` : 'No confidence band available.'}
-              tone="neutral"
-              badgeLabel={item.status || 'quoted'}
+              tone={getStatusTone(item.status)}
+              badgeLabel={formatStatusLabel(item.status || 'quoted')}
             />
           ))
         ) : (

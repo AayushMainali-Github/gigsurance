@@ -11,6 +11,12 @@ import { View } from 'react-native';
 import { useAuth } from '../features/auth/AuthContext';
 import { api } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
+import {
+  formatCurrencyInr,
+  formatPlatformLabel,
+  formatStatusLabel,
+  getStatusTone
+} from '../lib/utils/format';
 
 export function CoverageScreen() {
   const { user } = useAuth();
@@ -48,8 +54,8 @@ export function CoverageScreen() {
       description="This screen explains your policy posture in plain language using the current backend coverage and policy data."
     >
       <NoticeStrip
-        tone={policyStatus === 'active' ? 'success' : policyStatus === 'paused' ? 'warning' : 'info'}
-        text={`Your current policy is ${policyStatus}. This screen focuses on linked worker identity, policy state, and current protection context.`}
+        tone={getStatusTone(policyStatus)}
+        text={`Your current policy is ${formatStatusLabel(policyStatus)}. This screen focuses on linked worker identity, policy state, and current protection context.`}
       />
 
       {currentPolicy || linkedWorker ? (
@@ -57,10 +63,10 @@ export function CoverageScreen() {
           <View style={{ gap: theme.spacing.lg }}>
             <StatCard
               eyebrow="Policy Status"
-              title={policyStatus}
-              value={policyStatus === 'active' ? 'Protection Active' : policyStatus}
+              title={formatStatusLabel(policyStatus)}
+              value={policyStatus === 'active' ? 'Protection Active' : formatStatusLabel(policyStatus)}
               note="Active, paused, and cancelled policy states are shown here in worker-safe language."
-              tone={policyStatus === 'active' ? 'success' : policyStatus === 'paused' ? 'warning' : 'info'}
+              tone={getStatusTone(policyStatus)}
             />
           </View>
           <SectionTitle eyebrow="Coverage Details" title="Current Policy Posture" meta="Worker-facing summary of the current policy and linked worker state." />
@@ -69,18 +75,18 @@ export function CoverageScreen() {
             value={linkedWorker ? linkedWorker.platformDriverId : 'No linked worker'}
             meta={
               linkedWorker
-                ? `${linkedWorker.platformName} worker in ${linkedWorker.city}, ${linkedWorker.state}`
+                ? `${formatPlatformLabel(linkedWorker.platformName)} worker in ${linkedWorker.city}, ${linkedWorker.state}`
                 : 'You need a linked worker profile before coverage can function.'
             }
-            tone={linkedWorker ? 'success' : 'warning'}
-            badgeLabel={linkedWorker?.enrollmentStatus || 'missing'}
+            tone={linkedWorker ? getStatusTone(linkedWorker.enrollmentStatus) : 'warning'}
+            badgeLabel={formatStatusLabel(linkedWorker?.enrollmentStatus || 'missing')}
           />
           <DataListItem
             label="Policy Status"
-            value={policyStatus}
+            value={formatStatusLabel(policyStatus)}
             meta="This reflects the current backend policy state for your account."
-            tone={policyStatus === 'active' ? 'success' : policyStatus === 'paused' ? 'warning' : 'neutral'}
-            badgeLabel={policyStatus}
+            tone={getStatusTone(policyStatus)}
+            badgeLabel={formatStatusLabel(policyStatus)}
           />
           <DataListItem
             label="Started Date"
@@ -91,10 +97,10 @@ export function CoverageScreen() {
           />
           <DataListItem
             label="Protection State"
-            value={coverage?.status === 'active' ? 'Protected this week' : 'Not fully active'}
+            value={coverage?.status === 'active' ? 'Protected This Week' : 'Not Fully Active'}
             meta="Protection state is driven by your current coverage status."
-            tone={coverage?.status === 'active' ? 'success' : 'warning'}
-            badgeLabel={coverage?.status || 'unknown'}
+            tone={getStatusTone(coverage?.status)}
+            badgeLabel={formatStatusLabel(coverage?.status || 'unknown')}
           />
           <DataListItem
             label="No-Claim Weeks"
@@ -106,6 +112,13 @@ export function CoverageScreen() {
             meta="This reflects the current no-claim count when available from the policy record."
             tone="info"
             badgeLabel="Policy Meta"
+          />
+          <DataListItem
+            label="Current Weekly Premium"
+            value={formatCurrencyInr(currentPolicy?.currentWeeklyPremiumInr)}
+            meta="Coverage and premium wording stay aligned with the worker dashboard and premium surface."
+            tone="primary"
+            badgeLabel="Coverage"
           />
           <InfoPanel
             title="Coverage Summary"

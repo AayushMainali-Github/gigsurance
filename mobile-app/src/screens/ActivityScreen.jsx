@@ -9,6 +9,12 @@ import { SectionTitle } from '../components/SectionTitle';
 import { useAuth } from '../features/auth/AuthContext';
 import { api } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
+import {
+  formatCurrencyInr,
+  formatPlatformLabel,
+  formatStatusLabel,
+  getStatusTone
+} from '../lib/utils/format';
 
 function toDateLabel(value) {
   if (!value) return 'Date unavailable';
@@ -62,10 +68,10 @@ export function ActivityScreen() {
     events.push({
       id: `worker-${linkedWorker.id}`,
       label: 'Linked Worker',
-      value: `${linkedWorker.platformName} ${linkedWorker.platformDriverId}`,
+      value: `${formatPlatformLabel(linkedWorker.platformName)} ${linkedWorker.platformDriverId}`,
       meta: `${linkedWorker.city}, ${linkedWorker.state} on ${toDateLabel(linkedWorker.linkedAt)}`,
-      tone: 'success',
-      badgeLabel: linkedWorker.enrollmentStatus || 'linked',
+      tone: getStatusTone(linkedWorker.enrollmentStatus),
+      badgeLabel: formatStatusLabel(linkedWorker.enrollmentStatus || 'linked'),
       sortValue: linkedWorker.linkedAt || linkedWorker.createdAt || ''
     });
   }
@@ -74,10 +80,10 @@ export function ActivityScreen() {
     events.push({
       id: `policy-${currentPolicy.id}`,
       label: 'Policy Enrolled',
-      value: currentPolicy.status || 'active',
+      value: formatStatusLabel(currentPolicy.status || 'active'),
       meta: `Coverage started on ${toDateLabel(currentPolicy.startedAt)}`,
-      tone: currentPolicy.status === 'active' ? 'success' : 'warning',
-      badgeLabel: currentPolicy.status || 'policy',
+      tone: getStatusTone(currentPolicy.status),
+      badgeLabel: formatStatusLabel(currentPolicy.status || 'policy'),
       sortValue: currentPolicy.startedAt || ''
     });
   }
@@ -86,10 +92,10 @@ export function ActivityScreen() {
     events.push({
       id: `premium-${item.id}`,
       label: 'Weekly Premium Generated',
-      value: `Rs ${item.finalPremiumInr ?? 0}`,
+      value: formatCurrencyInr(item.finalPremiumInr),
       meta: `Coverage week ${toDateLabel(item.weekStart)} to ${toDateLabel(item.weekEnd)}`,
-      tone: item.manualReviewFlag || item.riskReviewFlag ? 'warning' : 'primary',
-      badgeLabel: item.status || 'quoted',
+      tone: item.manualReviewFlag || item.riskReviewFlag ? 'warning' : getStatusTone(item.status),
+      badgeLabel: formatStatusLabel(item.status || 'quoted'),
       sortValue: item.weekStart || ''
     });
   });
@@ -98,10 +104,10 @@ export function ActivityScreen() {
     events.push({
       id: `payout-${item.id}`,
       label: 'Payout Decision',
-      value: `${item.status || 'unknown'} - Rs ${item.finalPayoutInr ?? 0}`,
+      value: `${formatStatusLabel(item.status || 'unknown')} - ${formatCurrencyInr(item.finalPayoutInr)}`,
       meta: `Incident on ${toDateLabel(item.incidentDate)}`,
-      tone: item.status === 'approved' ? 'success' : item.status === 'held' ? 'warning' : 'danger',
-      badgeLabel: item.status || 'payout',
+      tone: getStatusTone(item.status),
+      badgeLabel: formatStatusLabel(item.status || 'payout'),
       sortValue: item.incidentDate || ''
     });
   });
