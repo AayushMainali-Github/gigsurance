@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { DataListItem } from '../components/DataListItem';
 import { EmptyState } from '../components/EmptyState';
+import { ErrorState } from '../components/ErrorState';
 import { InfoPanel } from '../components/InfoPanel';
 import { LoadingState } from '../components/LoadingState';
 import { NoticeStrip } from '../components/NoticeStrip';
@@ -10,7 +11,7 @@ import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
 import { View } from 'react-native';
 import { useAuth } from '../features/auth/AuthContext';
-import { api } from '../lib/api/client';
+import { api, getErrorMessage, isUnauthorizedError } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
 import {
   formatCurrencyInr,
@@ -35,6 +36,27 @@ export function ProfileScreen() {
         description="This screen contains account details, linked worker summary, policy summary, and logout."
       >
         <LoadingState label="Loading account details" />
+      </ScreenShell>
+    );
+  }
+
+  if (currentPolicyQuery.isError) {
+    return (
+      <ScreenShell
+        eyebrow="Account"
+        title="Profile"
+        description="This screen contains account details, linked worker summary, policy summary, and logout."
+      >
+        <ErrorState
+          title={isUnauthorizedError(currentPolicyQuery.error) ? 'Session expired' : 'Account unavailable'}
+          body={
+            isUnauthorizedError(currentPolicyQuery.error)
+              ? 'Your session is no longer valid. Sign in again to continue.'
+              : getErrorMessage(currentPolicyQuery.error, 'Account details could not be loaded from the backend right now.')
+          }
+          actionLabel={isUnauthorizedError(currentPolicyQuery.error) ? 'Log Out' : 'Retry'}
+          onAction={isUnauthorizedError(currentPolicyQuery.error) ? logout : () => currentPolicyQuery.refetch()}
+        />
       </ScreenShell>
     );
   }

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { DataListItem } from '../components/DataListItem';
 import { EmptyState } from '../components/EmptyState';
+import { ErrorState } from '../components/ErrorState';
 import { InfoPanel } from '../components/InfoPanel';
 import { LoadingState } from '../components/LoadingState';
 import { NoticeStrip } from '../components/NoticeStrip';
@@ -9,7 +10,7 @@ import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
 import { View } from 'react-native';
 import { useAuth } from '../features/auth/AuthContext';
-import { api } from '../lib/api/client';
+import { api, getErrorMessage, isUnauthorizedError } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
 import {
   formatCurrencyInr,
@@ -19,7 +20,7 @@ import {
 } from '../lib/utils/format';
 
 export function CoverageScreen() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const policySummaryQuery = useQuery({
     queryKey: ['worker-policy-summary'],
     queryFn: () => api.users.getPolicySummary()
@@ -33,6 +34,27 @@ export function CoverageScreen() {
         description="This screen explains your linked worker identity, policy posture, and current protection state."
       >
         <LoadingState label="Loading coverage details" />
+      </ScreenShell>
+    );
+  }
+
+  if (policySummaryQuery.isError) {
+    return (
+      <ScreenShell
+        eyebrow="Coverage"
+        title="Policy And Protection"
+        description="This screen explains your linked worker identity, policy posture, and current protection state."
+      >
+        <ErrorState
+          title={isUnauthorizedError(policySummaryQuery.error) ? 'Session expired' : 'Coverage unavailable'}
+          body={
+            isUnauthorizedError(policySummaryQuery.error)
+              ? 'Your session is no longer valid. Sign in again to continue.'
+              : getErrorMessage(policySummaryQuery.error, 'Coverage data could not be loaded from the local backend right now.')
+          }
+          actionLabel={isUnauthorizedError(policySummaryQuery.error) ? 'Log Out' : 'Retry'}
+          onAction={isUnauthorizedError(policySummaryQuery.error) ? logout : () => policySummaryQuery.refetch()}
+        />
       </ScreenShell>
     );
   }

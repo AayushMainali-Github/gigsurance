@@ -2,19 +2,21 @@ import { useQuery } from '@tanstack/react-query';
 import { View } from 'react-native';
 import { DataListItem } from '../components/DataListItem';
 import { EmptyState } from '../components/EmptyState';
+import { ErrorState } from '../components/ErrorState';
 import { InfoPanel } from '../components/InfoPanel';
 import { LoadingState } from '../components/LoadingState';
 import { NoticeStrip } from '../components/NoticeStrip';
 import { ScreenShell } from '../components/ScreenShell';
 import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
-import { api } from '../lib/api/client';
+import { api, getErrorMessage, isUnauthorizedError } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
 import {
   formatCurrencyInr,
   formatStatusLabel,
   getStatusTone
 } from '../lib/utils/format';
+import { useAuth } from '../features/auth/AuthContext';
 
 function formatIncidentDate(value) {
   if (!value) return 'Not available';
@@ -54,6 +56,7 @@ function getTrustMessage(item) {
 }
 
 export function PayoutsScreen() {
+  const { logout } = useAuth();
   const payoutsQuery = useQuery({
     queryKey: ['payouts-list'],
     queryFn: () => api.payouts.list({ page: 1, limit: 5 })
@@ -71,6 +74,31 @@ export function PayoutsScreen() {
         description="This screen surfaces payout decisions and payout transaction status for the worker."
       >
         <LoadingState label="Loading payout history" />
+      </ScreenShell>
+    );
+  }
+
+  if (payoutsQuery.isError || latestPayoutQuery.isError) {
+    const error = payoutsQuery.error || latestPayoutQuery.error;
+    return (
+      <ScreenShell
+        eyebrow="Payouts"
+        title="Protected Income"
+        description="This screen surfaces payout decisions and payout transaction status for the worker."
+      >
+        <ErrorState
+          title={isUnauthorizedError(error) ? 'Session expired' : 'Payout data unavailable'}
+          body={
+            isUnauthorizedError(error)
+              ? 'Your session is no longer valid. Sign in again to continue.'
+              : getErrorMessage(error, 'Payout data could not be loaded from the backend right now.')
+          }
+          actionLabel={isUnauthorizedError(error) ? 'Log Out' : 'Retry'}
+          onAction={isUnauthorizedError(error) ? logout : () => {
+            void payoutsQuery.refetch();
+            void latestPayoutQuery.refetch();
+          }}
+        />
       </ScreenShell>
     );
   }

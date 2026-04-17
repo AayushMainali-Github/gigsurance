@@ -48,6 +48,33 @@ Intentionally not copied:
 2. Ensure the backend is running.
 3. Start the app with `npm run start`.
 
+## Local Stack Integration
+
+For meaningful worker data, the local stack should be running in this order:
+
+1. `mock/mock-api` on `http://127.0.0.1:4000`
+2. `ml` on `http://127.0.0.1:8000`
+3. `backend` on `http://127.0.0.1:5000`
+
+If you want seeded worker accounts with existing policy, premium, and payout history, use the backend historical seed script after the dependent services are up:
+
+```powershell
+cd backend
+npm run seed:historical
+```
+
+The seed script creates accounts using this pattern:
+
+- email: `seeded+<platform>-<platformDriverId>@gigsurance.local`
+- password: `SeededUser!123`
+
+Example:
+
+- `seeded+swiggy-swiggy-del-00000145@gigsurance.local`
+- `SeededUser!123`
+
+Use one of the seeded identities that exists in your seeded dataset. The mobile app will then show linked worker, policy, premium, payout, and activity data instead of placeholder-only empty states.
+
 ## Environment
 
 The default API base URL is set in `app.json` under `expo.extra.apiBaseUrl`.

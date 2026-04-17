@@ -192,6 +192,10 @@ export function isUnavailableError(error) {
   return error instanceof ApiError && ['not_found', 'network_unavailable', 'request_timeout'].includes(error.code);
 }
 
+export function isUnauthorizedError(error) {
+  return error instanceof ApiError && error.status === 401;
+}
+
 export function getErrorMessage(error, fallback = 'Something went wrong') {
   if (error instanceof ApiError) {
     return error.message;

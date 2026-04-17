@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { View } from 'react-native';
 import { DataListItem } from '../components/DataListItem';
 import { EmptyState } from '../components/EmptyState';
+import { ErrorState } from '../components/ErrorState';
 import { InfoPanel } from '../components/InfoPanel';
 import { LoadingState } from '../components/LoadingState';
 import { NoticeStrip } from '../components/NoticeStrip';
@@ -9,7 +10,7 @@ import { ScreenShell } from '../components/ScreenShell';
 import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
 import { useAuth } from '../features/auth/AuthContext';
-import { api } from '../lib/api/client';
+import { api, getErrorMessage, isUnauthorizedError } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
 import {
   formatCurrencyInr,
@@ -18,7 +19,7 @@ import {
 } from '../lib/utils/format';
 
 export function HomeScreen() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const dashboardQuery = useQuery({
     queryKey: ['worker-dashboard'],
     queryFn: () => api.users.getDashboard()
@@ -40,6 +41,27 @@ export function HomeScreen() {
         description="Worker-facing home for coverage, weekly premium, and payout status."
       >
         <LoadingState label="Loading your worker dashboard" />
+      </ScreenShell>
+    );
+  }
+
+  if (dashboardQuery.isError) {
+    return (
+      <ScreenShell
+        eyebrow="Worker Dashboard"
+        title="GIGSurance"
+        description="Worker-facing home for coverage, weekly premium, and payout status."
+      >
+        <ErrorState
+          title={isUnauthorizedError(dashboardQuery.error) ? 'Session expired' : 'Dashboard unavailable'}
+          body={
+            isUnauthorizedError(dashboardQuery.error)
+              ? 'Your session is no longer valid. Sign in again to continue.'
+              : getErrorMessage(dashboardQuery.error, 'The backend is temporarily unavailable or local services are not fully running.')
+          }
+          actionLabel={isUnauthorizedError(dashboardQuery.error) ? 'Log Out' : 'Retry'}
+          onAction={isUnauthorizedError(dashboardQuery.error) ? logout : () => dashboardQuery.refetch()}
+        />
       </ScreenShell>
     );
   }

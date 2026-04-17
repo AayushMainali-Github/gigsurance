@@ -2,12 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { View } from 'react-native';
 import { DataListItem } from '../components/DataListItem';
 import { EmptyState } from '../components/EmptyState';
+import { ErrorState } from '../components/ErrorState';
 import { LoadingState } from '../components/LoadingState';
 import { NoticeStrip } from '../components/NoticeStrip';
 import { ScreenShell } from '../components/ScreenShell';
 import { SectionTitle } from '../components/SectionTitle';
 import { useAuth } from '../features/auth/AuthContext';
-import { api } from '../lib/api/client';
+import { api, getErrorMessage, isUnauthorizedError } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
 import {
   formatCurrencyInr,
@@ -22,7 +23,7 @@ function toDateLabel(value) {
 }
 
 export function ActivityScreen() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const workerQuery = useQuery({
     queryKey: ['worker-primary'],
     queryFn: () => api.workers.getPrimary()
@@ -53,6 +54,34 @@ export function ActivityScreen() {
         description="This screen surfaces premium generation, policy actions, and payout events in a simple worker timeline."
       >
         <LoadingState label="Loading your activity timeline" />
+      </ScreenShell>
+    );
+  }
+
+  if (workerQuery.isError || currentPolicyQuery.isError || premiumHistoryQuery.isError || payoutHistoryQuery.isError) {
+    const error = workerQuery.error || currentPolicyQuery.error || premiumHistoryQuery.error || payoutHistoryQuery.error;
+
+    return (
+      <ScreenShell
+        eyebrow="Activity"
+        title="Coverage Timeline"
+        description="This screen surfaces premium generation, policy actions, and payout events in a simple worker timeline."
+      >
+        <ErrorState
+          title={isUnauthorizedError(error) ? 'Session expired' : 'Activity unavailable'}
+          body={
+            isUnauthorizedError(error)
+              ? 'Your session is no longer valid. Sign in again to continue.'
+              : getErrorMessage(error, 'Timeline data could not be loaded from the backend right now.')
+          }
+          actionLabel={isUnauthorizedError(error) ? 'Log Out' : 'Retry'}
+          onAction={isUnauthorizedError(error) ? logout : () => {
+            void workerQuery.refetch();
+            void currentPolicyQuery.refetch();
+            void premiumHistoryQuery.refetch();
+            void payoutHistoryQuery.refetch();
+          }}
+        />
       </ScreenShell>
     );
   }

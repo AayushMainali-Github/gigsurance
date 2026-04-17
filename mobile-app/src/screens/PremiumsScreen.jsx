@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { View } from 'react-native';
 import { DataListItem } from '../components/DataListItem';
 import { EmptyState } from '../components/EmptyState';
+import { ErrorState } from '../components/ErrorState';
 import { InfoPanel } from '../components/InfoPanel';
 import { LoadingState } from '../components/LoadingState';
 import { NoticeStrip } from '../components/NoticeStrip';
@@ -9,12 +10,14 @@ import { ScreenShell } from '../components/ScreenShell';
 import { SectionTitle } from '../components/SectionTitle';
 import { StatCard } from '../components/StatCard';
 import { api } from '../lib/api/client';
+import { getErrorMessage, isUnauthorizedError } from '../lib/api/client';
 import { theme } from '../lib/theme/theme';
 import {
   formatCurrencyInr,
   formatStatusLabel,
   getStatusTone
 } from '../lib/utils/format';
+import { useAuth } from '../features/auth/AuthContext';
 
 function formatWeekRange(currentPremium) {
   if (!currentPremium?.weekStart || !currentPremium?.weekEnd) {
@@ -27,6 +30,7 @@ function formatWeekRange(currentPremium) {
 }
 
 export function PremiumsScreen() {
+  const { logout } = useAuth();
   const currentPremiumQuery = useQuery({
     queryKey: ['billing-current'],
     queryFn: () => api.billing.getCurrent()
@@ -44,6 +48,32 @@ export function PremiumsScreen() {
         description="Your current weekly premium, timing context, and recent pricing history."
       >
         <LoadingState label="Loading premium details" />
+      </ScreenShell>
+    );
+  }
+
+  if (currentPremiumQuery.isError || premiumHistoryQuery.isError) {
+    const error = currentPremiumQuery.error || premiumHistoryQuery.error;
+
+    return (
+      <ScreenShell
+        eyebrow="Weekly Premium"
+        title="Premiums"
+        description="Your current weekly premium, timing context, and recent pricing history."
+      >
+        <ErrorState
+          title={isUnauthorizedError(error) ? 'Session expired' : 'Premium data unavailable'}
+          body={
+            isUnauthorizedError(error)
+              ? 'Your session is no longer valid. Sign in again to continue.'
+              : getErrorMessage(error, 'Premium data could not be loaded from the backend right now.')
+          }
+          actionLabel={isUnauthorizedError(error) ? 'Log Out' : 'Retry'}
+          onAction={isUnauthorizedError(error) ? logout : () => {
+            void currentPremiumQuery.refetch();
+            void premiumHistoryQuery.refetch();
+          }}
+        />
       </ScreenShell>
     );
   }
